@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SUP · Torre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ocean: #0a1628;
+    --deep: #060e1c;
+    --surface: #0f2040;
+    --card: rgba(15,32,64,0.7);
+    --glass: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --accent: #00d4ff;
+    --accent2: #0085ff;
+    --warn: #ff4757;
+    --good: #2ed573;
+    --text: #e8f4ff;
+    --muted: rgba(232,244,255,0.4);
+    --mono: 'DM Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: var(--deep);
+    color: var(--text);
+    font-family: var(--body);
+    overflow-x: hidden;
+  }
+
+  /* Animated ocean bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0,133,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,212,255,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 80% at 50% 100%, rgba(10,22,40,0.95) 0%, transparent 70%);
+    animation: breathe 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes breathe {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+  }
+
+  /* Wave lines bg */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(0,212,255,0.02) 40px,
+      rgba(0,212,255,0.02) 41px
+    );
+  }
+
+  #app {
+    position: relative; z-index: 1;
+    max-width: 430px; margin: 0 auto;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 20px);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    padding: 20px 24px 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+
+  .logo-area h1 {
+    font-family: var(--display);
+    font-size: 52px; letter-spacing: 3px;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-area .sub {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .time-display {
+    font-family: var(--mono);
+    font-size: 22px; font-weight: 300;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .date-display {
+    font-family: var(--mono);
+    font-size: 9px; letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* Status bar */
+  .status-bar {
+    margin: 16px 24px 0;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 8px var(--good);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  .status-dot.loading { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .status-dot.error { background: var(--warn); box-shadow: 0 0 8px var(--warn); animation: none; }
+
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .status-text {
+    font-family: var(--mono);
+    font-size: 9px; letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .refresh-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 13px;
+    padding: 2px; line-height: 1;
+    transition: color 0.2s, transform 0.3s;
+  }
+  .refresh-btn:active { transform: rotate(180deg); color: var(--accent); }
+
+  /* Main metrics row */
+  .metrics-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 24px 0;
+  }
+
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 18px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .metric-card:active { transform: scale(0.97); }
+
+  .metric-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+  }
+
+  .metric-card.warn-card {
+    border-color: rgba(255,71,87,0.3);
+  }
+  .metric-card.warn-card::before {
+    background: linear-gradient(90deg, transparent, rgba(255,71,87,0.4), transparent);
+  }
+
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .metric-icon { font-size: 11px; opacity: 0.8; }
+
+  .metric-value {
+    font-family: var(--display);
+    font-size: 48px; letter-spacing: 2px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .metric-unit {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .metric-trend {
+    position: absolute; top: 18px; right: 16px;
+    font-size: 18px; font-weight: bold;
+  }
+  .trend-up { color: var(--warn); }
+  .trend-down { color: var(--good); }
+  .trend-stable { color: var(--muted); }
+
+  .metric-bar {
+    margin-top: 12px;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .metric-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Wind direction card — full width */
+  .wind-dir-card {
+    margin: 0 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 20px 18px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wind-dir-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+  }
+
+  .wind-dir-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .compass-wrapper {
+    display: flex; align-items: center; gap: 20px;
+  }
+
+  .compass {
+    width: 72px; height: 72px;
+    position: relative; flex-shrink: 0;
+  }
+
+  .compass-ring {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(0,212,255,0.2);
+    position: relative;
+    background: radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 70%);
+  }
+
+  /* Cardinal points */
+  .compass-ring::before {
+    content: 'N';
+    position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 8px; letter-spacing: 1px;
+    color: var(--accent); font-weight: 500;
+  }
+
+  .compass-needle {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2px; height: 26px;
+    margin-left: -1px; margin-top: -22px;
+    transform-origin: bottom center;
+    transition: transform 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .needle-north {
+    background: linear-gradient(to bottom, var(--accent), rgba(0,212,255,0.3));
+    border-radius: 2px 2px 0 0;
+    position: absolute; width: 100%; bottom: 0;
+    height: 60%; border-radius: 2px 2px 0 0;
+  }
+  .needle-south {
+    background: linear-gradient(to top, var(--warn), rgba(255,71,87,0.3));
+    border-radius: 0 0 2px 2px;
+    position: absolute; width: 100%; top: 0;
+    height: 40%;
+  }
+
+  .compass-dot {
+    position: absolute; top: 50%; left: 50%;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text);
+    transform: translate(-50%, -50%);
+  }
+
+  .wind-dir-info { flex: 1; }
+
+  .dir-now {
+    font-family: var(--display);
+    font-size: 38px; letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .dir-deg {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 2px; margin-top: 2px;
+  }
+
+  /* Forecast arrow row */
+  .forecast-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .forecast-label {
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 3px;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .forecast-arrows {
+    display: flex; align-items: center; gap: 0;
+    overflow-x: auto; padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .forecast-arrows::-webkit-scrollbar { display: none; }
+
+  .forecast-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; min-width: 52px;
+    padding: 8px 6px;
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+  .forecast-item.warn-dir { background: rgba(255,71,87,0.08); }
+
+  .forecast-time {
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .forecast-dir-val {
+    font-family: var(--display);
+    font-size: 20px; letter-spacing: 1px;
+  }
+  .forecast-dir-val.warn { color: var(--warn); }
+  .forecast-dir-val.ok { color: var(--accent); }
+
+  .forecast-deg {
+    font-family: var(--mono);
+    font-size: 8px; color: var(--muted);
+  }
+
+  .arrow-sep {
+    font-size: 10px; color: var(--border);
+    padding: 0 2px; margin-top: -8px;
+  }
+
+  /* Webcam section */
+  .webcam-section {
+    margin: 12px 24px 0;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 4px;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-left: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(255,71,87,0.15);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 8px; letter-spacing: 2px;
+    color: var(--warn);
+  }
+
+  .live-badge::before {
+    content: '';
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--warn);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  .webcam-container {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #000;
+    aspect-ratio: 16/9;
+  }
+
+  .webcam-container iframe {
+    width: 100%; height: 100%;
+    border: none; display: block;
+  }
+
+  .webcam-overlay {
+    position: absolute; top: 12px; left: 12px;
+    display: flex; gap: 8px; align-items: center;
+    pointer-events: none;
+  }
+
+  .cam-label {
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 4px 10px; border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  /* Swell card */
+  .swell-card {
+    margin: 12px 24px 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 18px 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex; gap: 20px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+
+  .swell-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+  }
+
+  .swell-vis {
+    flex-shrink: 0;
+    width: 60px; height: 60px;
+    position: relative;
+  }
+
+  .wave-svg { width: 100%; height: 100%; }
+
+  .swell-info { flex: 1; }
+
+  .swell-val {
+    font-family: var(--display);
+    font-size: 36px; letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .swell-label-text {
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 3px;
+    color: var(--muted); text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .val-loading { display: inline-block; width: 60px; height: 40px; }
+
+  /* Footer */
+  footer {
+    margin: 24px 24px env(safe-area-inset-bottom, 24px);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 8px; letter-spacing: 3px;
+    color: rgba(255,255,255,0.15);
+    text-transform: uppercase;
+  }
+
+  /* Entrance animations */
+  .fade-in {
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.1s; }
+  .fade-in:nth-child(3) { animation-delay: 0.15s; }
+  .fade-in:nth-child(4) { animation-delay: 0.2s; }
+  .fade-in:nth-child(5) { animation-delay: 0.25s; }
+  .fade-in:nth-child(6) { animation-delay: 0.3s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive for wider screens */
+  @media (min-width: 430px) {
+    #app { box-shadow: 0 0 80px rgba(0,0,0,0.5); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="fade-in">
+    <div class="logo-area">
+      <h1>SUP</h1>
+      <div class="sub">Torre Pedrera · Adriatico</div>
+    </div>
+    <div class="header-right">
+      <div class="time-display" id="clock">--:--</div>
+      <div class="date-display" id="dateDisplay">---</div>
+    </div>
+  </header>
+
+  <div class="status-bar fade-in">
+    <div class="status-dot loading" id="statusDot"></div>
+    <span class="status-text" id="statusText">Caricamento dati...</span>
+    <button class="refresh-btn" onclick="loadData()" title="Aggiorna">↻</button>
+  </div>
+
+  <div class="metrics-grid fade-in">
+    <div class="metric-card" id="waveCard">
+      <div class="metric-label"><span class="metric-icon">〜</span>Onde</div>
+      <div class="metric-value skeleton val-loading" id="waveVal"></div>
+      <div class="metric-unit" id="waveUnit"></div>
+      <div class="metric-bar"><div class="metric-bar-fill" id="waveBar" style="width:0%;background:linear-gradient(90deg,#0085ff,#00d4ff)"></div></div>
+      <div class="metric-trend" id="waveTrend"></div>
+    </div>
+    <div class="metric-card" id="windCard">
+      <div class="metric-label"><span class="metric-icon">≋</span>Vento</div>
+      <div class="metric-value skeleton val-loading" id="windVal"></div>
+      <div class="metric-unit" id="windUnit"></div>
+      <div class="metric-bar"><div class="metric-bar-fill" id="windBar" style="width:0%;background:linear-gradient(90deg,#0085ff,#00d4ff)"></div></div>
+      <div class="metric-trend" id="windTrend"></div>
+    </div>
+  </div>
+
+  <div style="height:12px"></div>
+
+  <div class="wind-dir-card fade-in">
+    <div class="wind-dir-header">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Direzione Vento</div>
+    </div>
+    <div class="compass-wrapper">
+      <div class="compass">
+        <div class="compass-ring">
+          <div class="compass-needle" id="compassNeedle">
+            <div class="needle-south"></div>
+            <div class="needle-north"></div>
+          </div>
+          <div class="compass-dot"></div>
+        </div>
+      </div>
+      <div class="wind-dir-info">
+        <div class="dir-now" id="dirNow">---</div>
+        <div class="dir-deg" id="dirDeg">--- °</div>
+      </div>
+    </div>
+    <div class="forecast-row">
+      <div class="forecast-label">Evoluzione prossime ore</div>
+      <div class="forecast-arrows" id="forecastArrows">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted)">Caricamento...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="swell-card fade-in">
+    <div class="swell-vis">
+      <svg class="wave-svg" viewBox="0 0 60 60" fill="none">
+        <path id="swellPath" d="M5 40 Q15 20 25 35 Q35 50 45 30 Q50 22 55 28" stroke="rgba(0,212,255,0.6)" stroke-width="2" fill="none" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="translate" values="0,0;-8,0;0,0" dur="3s" repeatCount="indefinite"/>
+        </path>
+        <path d="M5 48 Q15 35 25 42 Q35 52 45 38 Q50 32 55 36" stroke="rgba(0,133,255,0.3)" stroke-width="1.5" fill="none" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="translate" values="0,0;8,0;0,0" dur="4s" repeatCount="indefinite"/>
+        </path>
+      </svg>
+    </div>
+    <div class="swell-info">
+      <div class="swell-val skeleton val-loading" id="swellVal"></div>
+      <div class="swell-label-text">Swell height</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Dir. onde</div>
+      <div style="font-family:var(--display);font-size:28px;letter-spacing:2px" id="waveDir">---</div>
+    </div>
+  </div>
+
+  <div class="webcam-section fade-in">
+    <div class="section-label">
+      Webcam Live
+      <span class="live-badge">LIVE</span>
+    </div>
+    <div class="webcam-container">
+      <iframe
+        id="streamFrame"
+        src="https://www.youtube-nocookie.com/embed/1A2PUj7SS5o?autoplay=1&mute=1&controls=1&modestbranding=1&rel=0&playsinline=1&enablejsapi=0&iv_load_policy=3&fs=0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        title="Webcam Torre Pedrera"
+      ></iframe>
+      <div class="webcam-overlay">
+        <span class="cam-label">Torre Pedrera</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="fade-in">
+    Open-Meteo · Marine API · Aggiornato ogni 10 min
+  </footer>
+
+</div>
+
+<script>
+const LAT = 44.1166;
+const LON = 12.4862;
+
+const WEATHER_URL = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=wind_speed_10m,wind_direction_10m&hourly=wind_speed_10m,wind_direction_10m&timezone=Europe%2FRome&forecast_days=1`;
+const MARINE_URL = `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&hourly=wave_height,swell_wave_height,wave_direction&timezone=Europe%2FRome&forecast_days=1`;
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+
+  const days = ['DOM','LUN','MAR','MER','GIO','VEN','SAB'];
+  const months = ['GEN','FEB','MAR','APR','MAG','GIU','LUG','AGO','SET','OTT','NOV','DIC'];
+  document.getElementById('dateDisplay').textContent =
+    `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+function getClosestHourIndex(times) {
+  const now = new Date();
+  let best = 0, minDiff = Infinity;
+  for (let i = 0; i < times.length; i++) {
+    const diff = Math.abs(now - new Date(times[i]));
+    if (diff < minDiff) { minDiff = diff; best = i; }
+  }
+  return best;
+}
+
+function getWindDir(deg) {
+  if (deg == null) return 'N/D';
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+
+function isWarnDir(deg) {
+  return deg >= 185 && deg <= 355;
+}
+
+function getTrend(cur, nxt) {
+  if (nxt > cur + 0.5) return { arrow: '▲', cls: 'trend-up' };
+  if (nxt < cur - 0.5) return { arrow: '▼', cls: 'trend-down' };
+  return { arrow: '—', cls: 'trend-stable' };
+}
+
+function setStatus(type, msg) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'status-dot ' + (type === 'ok' ? '' : type);
+  txt.textContent = msg;
+}
+
+function setMetric(id, value, unit, trendEl, barEl, current, next, maxVal) {
+  const el = document.getElementById(id);
+  el.className = 'metric-value';
+  el.textContent = value;
+
+  const unitEl = document.getElementById(unit);
+  if (unitEl) unitEl.textContent = unit === 'waveUnit' ? 'centimetri' : 'km/h';
+
+  if (trendEl && current != null && next != null) {
+    const t = getTrend(current, next);
+    trendEl.textContent = t.arrow;
+    trendEl.className = 'metric-trend ' + t.cls;
+  }
+
+  if (barEl && current != null && maxVal) {
+    barEl.style.width = Math.min(100, (current / maxVal) * 100) + '%';
+  }
+}
+
+async function loadData() {
+  setStatus('loading', 'Aggiornamento dati meteo...');
+
+  try {
+    const [wRes, mRes] = await Promise.all([
+      fetch(WEATHER_URL),
+      fetch(MARINE_URL)
+    ]);
+    const weather = await wRes.json();
+    const marine = await mRes.json();
+
+    const wi = getClosestHourIndex(weather.hourly.time);
+    const mi = getClosestHourIndex(marine.hourly.time);
+
+    // Wave
+    const waveCur = marine.hourly.wave_height[mi];
+    const waveNxt = marine.hourly.wave_height[mi + 1];
+    const waveCm = waveCur != null ? Math.round(waveCur * 100) : null;
+    const waveNxtCm = waveNxt != null ? Math.round(waveNxt * 100) : null;
+
+    const waveEl = document.getElementById('waveVal');
+    waveEl.className = 'metric-value';
+    waveEl.textContent = waveCm != null ? waveCm : 'N/D';
+    document.getElementById('waveUnit').textContent = 'centimetri';
+    if (waveCm != null && waveNxtCm != null) {
+      const t = getTrend(waveCm, waveNxtCm);
+      const el = document.getElementById('waveTrend');
+      el.textContent = t.arrow; el.className = 'metric-trend ' + t.cls;
+    }
+    if (waveCm != null) {
+      document.getElementById('waveBar').style.width = Math.min(100, (waveCm / 200) * 100) + '%';
+    }
+
+    // Wind speed
+    const windCur = weather.current.wind_speed_10m;
+    const windNxt = weather.hourly.wind_speed_10m[wi + 1];
+
+    const windEl = document.getElementById('windVal');
+    windEl.className = 'metric-value';
+    windEl.textContent = windCur != null ? windCur.toFixed(1) : 'N/D';
+    document.getElementById('windUnit').textContent = 'km/h';
+    if (windCur != null && windNxt != null) {
+      const t = getTrend(windCur, windNxt);
+      const el = document.getElementById('windTrend');
+      el.textContent = t.arrow; el.className = 'metric-trend ' + t.cls;
+    }
+    if (windCur != null) {
+      document.getElementById('windBar').style.width = Math.min(100, (windCur / 60) * 100) + '%';
+      // Warn card if wind > 20
+      document.getElementById('windCard').classList.toggle('warn-card', windCur > 20);
+    }
+
+    // Wind direction
+    const windDirDeg = weather.current.wind_direction_10m;
+    document.getElementById('dirNow').textContent = getWindDir(windDirDeg);
+    document.getElementById('dirDeg').textContent = windDirDeg != null ? windDirDeg + ' °' : '--- °';
+
+    // Compass
+    if (windDirDeg != null) {
+      document.getElementById('compassNeedle').style.transform = `rotate(${windDirDeg}deg)`;
+      document.getElementById('dirNow').style.color = isWarnDir(windDirDeg) ? 'var(--warn)' : 'var(--text)';
+    }
+
+    // Forecast arrows
+    const futureDirs = weather.hourly.wind_direction_10m.slice(wi, wi + 6);
+    const futureTimes = weather.hourly.time.slice(wi, wi + 6);
+    const container = document.getElementById('forecastArrows');
+    container.innerHTML = '';
+    futureDirs.forEach((deg, i) => {
+      const dirStr = getWindDir(deg);
+      const warn = isWarnDir(deg);
+      const t = new Date(futureTimes[i]);
+      const hh = String(t.getHours()).padStart(2,'0');
+      const mm = String(t.getMinutes()).padStart(2,'0');
+
+      const item = document.createElement('div');
+      item.className = 'forecast-item' + (warn ? ' warn-dir' : '');
+      item.innerHTML = `
+        <div class="forecast-time">${hh}:${mm}</div>
+        <div class="forecast-dir-val ${warn ? 'warn' : 'ok'}">${dirStr}</div>
+        <div class="forecast-deg">${Math.round(deg)}°</div>
+      `;
+      container.appendChild(item);
+
+      if (i < futureDirs.length - 1) {
+        const sep = document.createElement('div');
+        sep.className = 'arrow-sep';
+        sep.textContent = '›';
+        container.appendChild(sep);
+      }
+    });
+
+    // Swell
+    const swellCur = marine.hourly.swell_wave_height?.[mi];
+    const swellEl = document.getElementById('swellVal');
+    swellEl.className = 'swell-val';
+    if (swellCur != null) {
+      const swellCm = Math.round(swellCur * 100);
+      swellEl.textContent = swellCm + ' cm';
+    } else {
+      swellEl.textContent = 'N/D';
+    }
+
+    // Wave direction
+    const waveDirDeg = marine.hourly.wave_direction?.[mi];
+    document.getElementById('waveDir').textContent = getWindDir(waveDirDeg);
+
+    setStatus('ok', `Aggiornato · ${new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`);
+
+  } catch (e) {
+    console.error(e);
+    setStatus('error', 'Errore caricamento dati');
+    ['waveVal','windVal','swellVal'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = el.className.replace('skeleton','');
+      el.textContent = 'N/D';
+    });
+  }
+}
+
+loadData();
+setInterval(loadData, 10 * 60 * 1000);
+</script>
+</body>
+</html>
