@@ -344,6 +344,15 @@ header {
   margin-bottom: 8px;
 }
 
+.card-label-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.card-label-row .card-label { margin-bottom: 0; }
+.card-label-row .card-label:last-child {
+  width: 155px; text-align: center; flex-shrink: 0;
+}
+
 /* ═══════════════════════════════════════════════════════
    WIND MAIN — colonna sinistra + wx a destra full-height
    ═══════════════════════════════════════════════════════ */
@@ -401,9 +410,39 @@ header {
   flex-direction: column !important;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 10px 10px !important;
+  gap: 4px;
+  padding: 8px 10px !important;
 }
+
+.wx-current-row {
+  display: flex; align-items: baseline; gap: 5px;
+}
+
+.wx-side .wx-icon { font-size: 18px; line-height: 1; }
+.wx-side .wx-temp { font-size: 22px; letter-spacing: 1px; }
+
+.wx-sep {
+  width: 80%; height: 1px;
+  background: rgba(0,200,240,.12);
+  margin: 2px 0;
+}
+
+.wx-forecast {
+  display: flex; gap: 6px; align-items: flex-end;
+  justify-content: center;
+}
+
+.wx-fi {
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+
+.wx-fi-h {
+  font-family: var(--mono);
+  font-size: 5.5px; letter-spacing: .5px;
+  color: rgba(220,235,255,.38); text-transform: uppercase;
+}
+
+.wx-fi-i { font-size: 13px; line-height: 1; }
 
 /* ── Compass ────────────────────────────────────────── */
 .compass {
@@ -990,7 +1029,10 @@ footer {
   </div>
 
   <div class="wind-card">
-    <div class="card-label">DIREZIONE VENTO</div>
+    <div class="card-label-row">
+      <div class="card-label">DIREZIONE VENTO</div>
+      <div class="card-label">METEO</div>
+    </div>
     <div class="wind-main">
 
       <!-- COLONNA SINISTRA: compass + dir + speed -->
@@ -1030,9 +1072,19 @@ footer {
 
       <!-- COLONNA DESTRA: meteo, stessa altezza totale -->
       <div class="wx-widget wx-side">
-        <div class="wx-icon" id="wxIcon">⋯</div>
-        <div class="wx-temp" id="wxTemp">--°</div>
+        <div class="wx-current-row">
+          <div class="wx-icon" id="wxIcon">⋯</div>
+          <div class="wx-temp" id="wxTemp">--°</div>
+        </div>
         <div class="wx-cond" id="wxCond">---</div>
+        <div class="wx-sep"></div>
+        <div class="wx-forecast" id="wxForecast">
+          <div class="wx-fi"><div class="wx-fi-h">--</div><div class="wx-fi-i">·</div></div>
+          <div class="wx-fi"><div class="wx-fi-h">--</div><div class="wx-fi-i">·</div></div>
+          <div class="wx-fi"><div class="wx-fi-h">--</div><div class="wx-fi-i">·</div></div>
+          <div class="wx-fi"><div class="wx-fi-h">--</div><div class="wx-fi-i">·</div></div>
+          <div class="wx-fi"><div class="wx-fi-h">--</div><div class="wx-fi-i">·</div></div>
+        </div>
       </div>
 
     </div>
@@ -1294,7 +1346,7 @@ async function loadAll(){
     const [mRes,wRes,xRes]=await Promise.all([
       fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period&timezone=Europe/Rome`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&timezone=Europe/Rome`)
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode&timezone=Europe/Rome`)
     ]);
     const [marine,wind,wx]=await Promise.all([mRes.json(),wRes.json(),xRes.json()]);
 
@@ -1329,6 +1381,23 @@ async function loadAll(){
     document.getElementById('wxIcon').textContent=icon;
     document.getElementById('wxTemp').textContent=Math.round(wx.current.temperature_2m)+'°';
     document.getElementById('wxCond').textContent=label;
+
+    /* meteo forecast biorario */
+    if(wx.hourly?.time && wx.hourly?.weathercode){
+      const wxTimes=wx.hourly.time, wxCodes=wx.hourly.weathercode;
+      const fcast=document.getElementById('wxForecast');
+      const slots=fcast.querySelectorAll('.wx-fi');
+      let cnt=0;
+      for(let i=0;i<wxTimes.length&&cnt<5;i++){
+        const t=new Date(wxTimes[i]);
+        if(t>now && t.getHours()%2===0){
+          const hh=String(t.getHours()).padStart(2,'0');
+          slots[cnt].querySelector('.wx-fi-h').textContent=hh;
+          slots[cnt].querySelector('.wx-fi-i').textContent=wmoInfo(wxCodes[i]).icon;
+          cnt++;
+        }
+      }
+    }
 
     /* forecast */
     const now=new Date(), times=wind.hourly.time, wdirs=wind.hourly.winddirection_10m, wspds=wind.hourly.windspeed_10m;
