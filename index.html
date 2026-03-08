@@ -159,6 +159,16 @@ header {
   50%      { opacity: .35; box-shadow: 0 0 3px rgba(31,255,160,.2); }
 }
 
+.status-dot.error {
+  background: #f0566a;
+  box-shadow: 0 0 8px rgba(240,86,106,.55);
+  animation: blinkError 1.2s ease-in-out infinite;
+}
+@keyframes blinkError {
+  0%,100% { opacity: 1; box-shadow: 0 0 8px rgba(240,86,106,.55); }
+  50%      { opacity: .4; box-shadow: 0 0 3px rgba(240,86,106,.2); }
+}
+
 .status-text {
   font-family: var(--mono);
   font-size: 8.5px; letter-spacing: 3px;
@@ -176,6 +186,16 @@ header {
 .status-refresh:active { transform: scale(.9); }
 .spin { animation: rotateSpin .65s cubic-bezier(.4,0,.2,1); }
 @keyframes rotateSpin { to { transform: rotate(360deg); } }
+
+/* ── Loading pulse ──────────────────────────────────── */
+@keyframes loadPulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .28; }
+}
+.loading {
+  animation: loadPulse 1.1s ease-in-out infinite;
+  pointer-events: none;
+}
 
 /* ═══════════════════════════════════════════════════════
    SHADOW TOKEN — 3D depth system, percettibile su dark bg
@@ -369,6 +389,42 @@ header {
   color: var(--text-3); margin-top: 6px;
 }
 
+.wind-from-row,
+.wind-to-row {
+  display: flex; align-items: baseline; gap: 5px;
+  margin-top: 6px;
+}
+
+.wind-from-label,
+.wind-to-label {
+  font-family: var(--mono);
+  font-size: 6px; letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.wind-from-label {
+  background: rgba(240,86,106,.12);
+  color: #f0566a;
+  border: 1px solid rgba(240,86,106,.22);
+}
+
+.wind-to-label {
+  background: rgba(0,200,240,.08);
+  color: var(--accent);
+  border: 1px solid rgba(0,200,240,.18);
+}
+
+.wind-from-val,
+.wind-to-val {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 1.5px;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+
 /* ═══════════════════════════════════════════════════════
    MICRO-WIDGETS — speed + weather
    Shared design token: identical shape, different accent
@@ -500,6 +556,23 @@ header {
   font-family: var(--mono);
   font-size: 6.5px; letter-spacing: 1px;
   color: var(--text-3); margin-top: 4px;
+}
+
+.fi-spd {
+  font-family: var(--disp);
+  font-size: 14px; letter-spacing: .5px; line-height: 1;
+  margin-top: 5px;
+  transition: color .3s;
+}
+.fi-spd.da-terra { color: rgba(240,86,106,.75); }
+.fi-spd.da-mare  { color: rgba(0,200,240,.75); }
+
+.fi-spd-unit {
+  font-family: var(--mono);
+  font-size: 5.5px; letter-spacing: 1px;
+  color: var(--text-3);
+  margin-left: 2px; vertical-align: middle;
+  text-transform: uppercase;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -686,6 +759,14 @@ footer {
       <div class="wind-dir-info">
         <div class="wind-abbr da-terra" id="windAbbr">---</div>
         <div class="wind-deg" id="windDeg">--- °</div>
+        <div class="wind-from-row">
+          <span class="wind-from-label">DA</span>
+          <span class="wind-from-val" id="windFrom">---</span>
+        </div>
+        <div class="wind-to-row">
+          <span class="wind-to-label">VA</span>
+          <span class="wind-to-val" id="windTo">---</span>
+        </div>
       </div>
 
       <!-- wind speed widget — prima del meteo -->
@@ -798,24 +879,49 @@ function windClass(deg){
 }
 
 function wmoInfo(c){
-  if(c===0)  return{icon:'☀️',label:'SOLEGGIATO'};
-  if(c<=1)   return{icon:'🌤️',label:'POCO\nNUVOLOSO'};
-  if(c<=2)   return{icon:'⛅',label:'PARZ.\nNUVOLOSO'};
-  if(c===3)  return{icon:'☁️',label:'COPERTO'};
-  if(c<=48)  return{icon:'🌫️',label:'NEBBIA'};
-  if(c<=57)  return{icon:'🌦️',label:'PIOVIGGINE'};
-  if(c<=67)  return{icon:'🌧️',label:'PIOGGIA'};
-  if(c<=77)  return{icon:'🌨️',label:'NEVE'};
-  if(c<=82)  return{icon:'🌦️',label:'ROVESCI'};
-  return          {icon:'⛈️',label:'TEMPORALE'};
+  // WMO Weather Interpretation Codes — specifica completa
+  if(c===0)              return{icon:'☀️', label:'SOLEGGIATO'};
+  if(c===1)              return{icon:'🌤️', label:'POCO\\nNUVOLOSO'};
+  if(c===2)              return{icon:'⛅',  label:'PARZ.\\nNUVOLOSO'};
+  if(c===3)              return{icon:'☁️', label:'COPERTO'};
+  if(c>=10&&c<=19)       return{icon:'🌫️', label:'FOSCHIA'};
+  if(c>=20&&c<=29)       return{icon:'🌦️', label:'PREC.\\nRECENTI'};
+  if(c>=30&&c<=39)       return{icon:'💨', label:'BUFERA\\nSABBIA'};
+  if(c>=40&&c<=49)       return{icon:'🌫️', label:'NEBBIA'};
+  if(c===51||c===53)     return{icon:'🌦️', label:'PIOVIGGINE\\nLEGGERA'};
+  if(c===55)             return{icon:'🌦️', label:'PIOVIGGINE\\nINTENSA'};
+  if(c===56||c===57)     return{icon:'🌨️', label:'PIOVIGGINE\\nGELATA'};
+  if(c===61||c===63)     return{icon:'🌧️', label:'PIOGGIA'};
+  if(c===65)             return{icon:'🌧️', label:'PIOGGIA\\nINTENSA'};
+  if(c===66||c===67)     return{icon:'🌨️', label:'PIOGGIA\\nGELATA'};
+  if(c===71||c===73)     return{icon:'❄️', label:'NEVE'};
+  if(c===75)             return{icon:'❄️', label:'NEVE\\nINTENSA'};
+  if(c===77)             return{icon:'🌨️', label:'NEVISCHIO'};
+  if(c===80||c===81)     return{icon:'🌦️', label:'ROVESCI'};
+  if(c===82)             return{icon:'🌧️', label:'ROVESCI\\nINTENSI'};
+  if(c===85||c===86)     return{icon:'🌨️', label:'ROVESCI\\nNEVE'};
+  if(c===95)             return{icon:'⛈️', label:'TEMPORALE'};
+  if(c===96||c===99)     return{icon:'⛈️', label:'TEMPORA.\\nGRANDINE'};
+  return                        {icon:'🌡️', label:'N/D'};
+}
+
+/* ── LOADING STATE ─────────────────────────── */
+const LOADING_IDS = ['windAbbr','windDeg','windSpd','windFrom','windTo','waveHbig','waveDirVal','wxIcon','wxTemp','wxCond'];
+function setLoading(on){
+  LOADING_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) on ? el.classList.add('loading') : el.classList.remove('loading');
+  });
+  document.getElementById('forecastRow').style.opacity = on ? '.35' : '1';
 }
 
 /* ── LOAD ───────────────────────────────── */
 async function loadAll(){
+  setLoading(true);
   try{
     const [mRes,wRes,xRes]=await Promise.all([
       fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction&timezone=Europe/Rome`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&timezone=Europe/Rome`)
     ]);
     const [marine,wind,wx]=await Promise.all([mRes.json(),wRes.json(),xRes.json()]);
@@ -829,6 +935,10 @@ async function loadAll(){
     document.getElementById('windAbbr').className='wind-abbr '+windClass(wDeg);
     document.getElementById('windDeg').textContent=`${wDeg} °`;
     document.getElementById('needle').style.transform=`rotate(${wDeg}deg)`;
+    // DA = direzione di provenienza (dato meteo), VA = opposto (dove il vento si dirige)
+    const oppositeDir = (wDeg + 180) % 360;
+    document.getElementById('windFrom').textContent = degToCompass(wDeg) + '  ' + wDeg + '°';
+    document.getElementById('windTo').textContent   = degToCompass(oppositeDir) + '  ' + oppositeDir + '°';
 
     /* onde */
     if(marine?.current){
@@ -846,7 +956,7 @@ async function loadAll(){
     document.getElementById('wxCond').textContent=label;
 
     /* forecast */
-    const now=new Date(), times=wind.hourly.time, wdirs=wind.hourly.winddirection_10m;
+    const now=new Date(), times=wind.hourly.time, wdirs=wind.hourly.winddirection_10m, wspds=wind.hourly.windspeed_10m;
     const row=document.getElementById('forecastRow');
     row.innerHTML=''; let cnt=0;
     for(let i=0;i<times.length&&cnt<8;i++){
@@ -854,17 +964,21 @@ async function loadAll(){
       if(t>now){
         const el=document.createElement('div');
         el.className='fi';
-        el.innerHTML=`<div class="fi-time">${String(t.getHours()).padStart(2,'0')}:00</div><div class="fi-dir ${windClass(wdirs[i])}">${degToCompass(wdirs[i])}</div><div class="fi-deg">${Math.round(wdirs[i])}°</div>`;
+        el.innerHTML=`<div class="fi-time">${String(t.getHours()).padStart(2,'0')}:00</div><div class="fi-dir ${windClass(wdirs[i])}">${degToCompass(wdirs[i])}</div><div class="fi-deg">${Math.round(wdirs[i])}°</div><div class="fi-spd ${windClass(wdirs[i])}">${Math.round(wspds[i])}<span class="fi-spd-unit">km/h</span></div>`;
         row.appendChild(el); cnt++;
       }
     }
 
     /* status */
     const n=new Date();
-    document.getElementById('statusText').textContent=`AGGIORNATO · ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+    document.getElementById('statusText').textContent=`AGGIORNATO · \${String(n.getHours()).padStart(2,'0')}:\${String(n.getMinutes()).padStart(2,'0')}`;
+    document.querySelector('.status-dot').classList.remove('error');
+    setLoading(false);
   }catch(e){
     console.error(e);
     document.getElementById('statusText').textContent='ERRORE CONNESSIONE';
+    document.querySelector('.status-dot').classList.add('error');
+    setLoading(false);
   }
 }
 
