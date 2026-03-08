@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>SUP · Torre Pedrera</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<title>MeteoSUP · Torre Pedrera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Bebas+Neue&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════
    DESIGN SYSTEM — SUP PREMIUM
@@ -88,32 +88,71 @@ header {
   display: flex; align-items: flex-start; justify-content: space-between;
 }
 
+.logo {
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo-spacer {
+  flex: 1;
+}
+
 .logo h1 {
-  font-family: var(--disp);
-  font-size: 36px; letter-spacing: 3px; line-height: 1;
-  background: linear-gradient(140deg, #ffffff 30%, var(--accent) 100%);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 34px; letter-spacing: 1px; line-height: 1;
+}
+
+/* "Meteo" — oro antico, caldo, autorevole */
+.h1-meteo {
+  background: linear-gradient(160deg, #e8c97a 0%, #c8a450 45%, #a07830 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* 3D text shadow: luce zenitale + spessore + profondità */
   filter:
-    drop-shadow(0 1px 0 rgba(255,255,255,.18))
-    drop-shadow(0 2px 0 rgba(0,0,0,.80))
-    drop-shadow(0 4px 12px rgba(0,200,240,.22))
-    drop-shadow(0 8px 24px rgba(0,0,0,.40));
+    drop-shadow(0 1px 0 rgba(255,220,140,.50))
+    drop-shadow(0 2px 0 rgba(40,18,0,.92))
+    drop-shadow(0 4px 12px rgba(180,120,20,.22))
+    drop-shadow(0 10px 24px rgba(0,0,0,.48));
+  letter-spacing: 1px;
 }
+
+/* "SUP" — bianco crema dominante, massima luminosità */
+.h1-sup {
+  background: linear-gradient(160deg, #ffffff 0%, #f5efe0 50%, #ddd0b8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,240,.60))
+    drop-shadow(0 2px 0 rgba(20,10,0,.95))
+    drop-shadow(0 3px 0 rgba(10,5,0,.70))
+    drop-shadow(0 6px 16px rgba(200,160,80,.18))
+    drop-shadow(0 12px 28px rgba(0,0,0,.50));
+  letter-spacing: 3px;
+}
+
 
 .logo .sub {
   font-family: var(--mono);
-  font-size: 7.5px; letter-spacing: 4px;
-  color: var(--text-3);
-  text-transform: uppercase; margin-top: 4px;
+  font-size: 8px; letter-spacing: 4px;
+  margin-top: auto;
+  background: linear-gradient(160deg, #d4a84b 0%, #b8882e 55%, #8c6420 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+  filter:
+    drop-shadow(0 1px 0 rgba(240,190,80,.30))
+    drop-shadow(0 2px 4px rgba(30,12,0,.75))
+    drop-shadow(0 4px 10px rgba(0,0,0,.35));
 }
 
-.header-right { text-align: right; }
+.header-right {
+  text-align: right;
+  display: flex; flex-direction: column; align-items: flex-end;
+}
 
 .time-display {
   font-family: var(--disp);
-  font-size: 28px; letter-spacing: 2px; line-height: 1;
+  font-size: 22px; letter-spacing: 2px; line-height: 1;
   color: var(--text);
   /* 3D text shadow: stessa logica — highlight + spessore + glow */
   text-shadow:
@@ -125,9 +164,9 @@ header {
 
 .date-display {
   font-family: var(--mono);
-  font-size: 7.5px; letter-spacing: 3px;
+  font-size: 7px; letter-spacing: 2.5px;
   color: var(--text-3);
-  text-transform: uppercase; margin-top: 4px;
+  text-transform: uppercase; margin-top: 3px;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -135,7 +174,7 @@ header {
    ═══════════════════════════════════════════════════════ */
 .status-bar {
   margin: 2px 14px 8px;
-  padding: 6px 12px 6px 14px;
+  padding: 5px 12px 5px 14px;
   background: rgba(255,255,255,.028);
   border: 1px solid rgba(255,255,255,.06);
   border-top: 1px solid rgba(255,255,255,.18);
@@ -296,13 +335,18 @@ header {
 }
 
 /* ═══════════════════════════════════════════════════════
-   WIND MAIN — 2-row layout
-   Row 1: compass + direzione/DA/VA
-   Row 2: speed widget + weather widget
+   WIND MAIN — colonna sinistra + wx a destra full-height
    ═══════════════════════════════════════════════════════ */
 .wind-main {
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: row; gap: 10px;
+  align-items: stretch;
   margin-bottom: 14px;
+}
+
+/* Colonna sinistra: compass/dir sopra, speed sotto */
+.wind-left-col {
+  display: flex; flex-direction: column; gap: 10px;
+  flex: 1; min-width: 0;
 }
 
 .wind-top-row {
@@ -313,8 +357,7 @@ header {
   display: flex; gap: 8px;
 }
 
-.wind-widgets-row .spd-widget,
-.wind-widgets-row .wx-widget {
+.wind-widgets-row .spd-widget {
   flex: 1;
   flex-direction: row;
   align-items: center;
@@ -324,22 +367,32 @@ header {
   min-width: 0;
 }
 
-.wind-widgets-row .spd-icon,
-.wind-widgets-row .wx-icon {
+.wind-widgets-row .spd-icon {
   font-size: 18px; flex-shrink: 0;
 }
 
-.wind-widgets-row .spd-val,
-.wind-widgets-row .wx-temp {
+.wind-widgets-row .spd-val {
   font-size: 24px;
 }
 
-.wind-widgets-row .spd-unit,
-.wind-widgets-row .wx-cond {
+.wind-widgets-row .spd-unit {
   font-size: 6.5px; letter-spacing: 1.5px;
-  text-align: left; white-space: pre-line;
+  text-align: left;
   margin-left: auto;
   padding-left: 4px;
+}
+
+/* wx meteo: colonna destra, stessa altezza totale */
+.wx-side {
+  flex-shrink: 0;
+  width: 110px;
+  align-self: stretch;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 10px !important;
 }
 
 /* ── Compass ────────────────────────────────────────── */
@@ -767,8 +820,9 @@ footer {
 
   <header>
     <div class="logo">
-      <h1>SUP</h1>
-      <div class="sub">Torre Pedrera · Adriatico</div>
+      <h1><span class="h1-meteo">Meteo</span><span class="h1-sup">SUP</span></h1>
+      <div class="logo-spacer"></div>
+      <div class="sub">Torre Pedrera</div>
     </div>
     <div class="header-right">
       <div class="time-display" id="clock">--:--</div>
@@ -786,44 +840,46 @@ footer {
     <div class="card-label">DIREZIONE VENTO</div>
     <div class="wind-main">
 
-      <!-- ROW 1: compass + direzione + DA/VA -->
-      <div class="wind-top-row">
-        <div class="compass">
-          <div class="c-n">N</div>
-          <div class="c-needle" id="needle">
-            <div class="c-tip"></div>
-            <div class="c-tail"></div>
+      <!-- COLONNA SINISTRA: compass + dir + speed -->
+      <div class="wind-left-col">
+        <div class="wind-top-row">
+          <div class="compass">
+            <div class="c-n">N</div>
+            <div class="c-needle" id="needle">
+              <div class="c-tip"></div>
+              <div class="c-tail"></div>
+            </div>
+            <div class="c-dot"></div>
           </div>
-          <div class="c-dot"></div>
+
+          <div class="wind-dir-info">
+            <div class="wind-abbr da-terra" id="windAbbr">---</div>
+            <div class="wind-deg" id="windDeg">--- °</div>
+            <div class="wind-from-row">
+              <span class="wind-from-label">DA</span>
+              <span class="wind-from-val" id="windFrom">---</span>
+            </div>
+            <div class="wind-to-row">
+              <span class="wind-to-label">VA</span>
+              <span class="wind-to-val" id="windTo">---</span>
+            </div>
+          </div>
         </div>
 
-        <div class="wind-dir-info">
-          <div class="wind-abbr da-terra" id="windAbbr">---</div>
-          <div class="wind-deg" id="windDeg">--- °</div>
-          <div class="wind-from-row">
-            <span class="wind-from-label">DA</span>
-            <span class="wind-from-val" id="windFrom">---</span>
-          </div>
-          <div class="wind-to-row">
-            <span class="wind-to-label">VA</span>
-            <span class="wind-to-val" id="windTo">---</span>
+        <div class="wind-widgets-row">
+          <div class="spd-widget">
+            <div class="spd-icon">💨</div>
+            <div class="spd-val" id="windSpd">--</div>
+            <div class="spd-unit">km/h</div>
           </div>
         </div>
       </div>
 
-      <!-- ROW 2: speed + weather widgets -->
-      <div class="wind-widgets-row">
-        <div class="spd-widget">
-          <div class="spd-icon">💨</div>
-          <div class="spd-val" id="windSpd">--</div>
-          <div class="spd-unit">km/h</div>
-        </div>
-
-        <div class="wx-widget">
-          <div class="wx-icon" id="wxIcon">⋯</div>
-          <div class="wx-temp" id="wxTemp">--°</div>
-          <div class="wx-cond" id="wxCond">---</div>
-        </div>
+      <!-- COLONNA DESTRA: meteo, stessa altezza totale -->
+      <div class="wx-widget wx-side">
+        <div class="wx-icon" id="wxIcon">⋯</div>
+        <div class="wx-temp" id="wxTemp">--°</div>
+        <div class="wx-cond" id="wxCond">---</div>
       </div>
 
     </div>
@@ -881,7 +937,7 @@ footer {
     </div>
   </div>
 
-  <footer>SUP · Torre Pedrera · Adriatico</footer>
+  <footer>MeteoSUP · Torre Pedrera · Adriatico</footer>
 </div>
 
 <script>
