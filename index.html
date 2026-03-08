@@ -125,8 +125,10 @@ header {
 .status-bar {
   margin: 4px 24px 20px;
   padding: 10px 14px 10px 16px;
-  background: rgba(255,255,255,.025);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,.028);
+  border: 1px solid rgba(255,255,255,.06);
+  border-top: 1px solid rgba(255,255,255,.18);
+  border-bottom: 1px solid rgba(0,0,0,.60);
   border-radius: var(--r-pill);
   display: flex; align-items: center; gap: 10px;
   backdrop-filter: blur(12px);
@@ -165,36 +167,54 @@ header {
 @keyframes rotateSpin { to { transform: rotate(360deg); } }
 
 /* ═══════════════════════════════════════════════════════
-   SHADOW TOKEN — 3D depth system, used everywhere
-   Layer 1: top highlight inset (simula luce zenitale)
-   Layer 2: penumbra diffusa media
-   Layer 3: ombra profonda lunga
-   Layer 4: micro-ombra di contatto
+   SHADOW TOKEN — 3D depth system, percettibile su dark bg
+   La chiave: highlight inset in cima (luce zenitale) +
+   bordo-spessore scuro in basso + drop shadow profonda
    ═══════════════════════════════════════════════════════ */
 :root {
   --shadow-card:
-    0 1px 0 rgba(255,255,255,.05) inset,
-    0 2px 6px rgba(0,0,0,.22),
-    0 10px 28px rgba(0,0,0,.28),
-    0 28px 56px rgba(0,0,0,.22);
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 -1px 0 rgba(0,0,0,.80) inset,
+    0 1px 0 rgba(255,255,255,.10),
+    0 4px 8px rgba(0,0,0,.50),
+    0 14px 32px rgba(0,0,0,.42),
+    0 40px 72px rgba(0,0,0,.32);
+
   --shadow-widget:
-    0 1px 0 rgba(255,255,255,.04) inset,
-    0 2px 4px rgba(0,0,0,.18),
-    0 8px 20px rgba(0,0,0,.22),
-    0 16px 36px rgba(0,0,0,.16);
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 -1px 0 rgba(0,0,0,.75) inset,
+    0 1px 0 rgba(255,255,255,.08),
+    0 3px 7px rgba(0,0,0,.44),
+    0 10px 24px rgba(0,0,0,.36),
+    0 22px 44px rgba(0,0,0,.24);
+
   --shadow-chip:
-    0 1px 0 rgba(255,255,255,.03) inset,
-    0 2px 4px rgba(0,0,0,.16),
-    0 6px 14px rgba(0,0,0,.18);
+    0 1px 0 rgba(255,255,255,.14) inset,
+    0 -1px 0 rgba(0,0,0,.70) inset,
+    0 2px 5px rgba(0,0,0,.42),
+    0 7px 16px rgba(0,0,0,.32),
+    0 14px 26px rgba(0,0,0,.20);
+
   --shadow-pill:
-    0 1px 0 rgba(255,255,255,.04) inset,
-    0 2px 8px rgba(0,0,0,.18),
-    0 8px 24px rgba(0,0,0,.16);
+    0 1px 0 rgba(255,255,255,.16) inset,
+    0 -1px 0 rgba(0,0,0,.65) inset,
+    0 2px 6px rgba(0,0,0,.40),
+    0 9px 22px rgba(0,0,0,.30),
+    0 20px 38px rgba(0,0,0,.20);
+
   --shadow-video:
-    0 0 0 1px rgba(255,255,255,.03) inset,
-    0 4px 12px rgba(0,0,0,.3),
-    0 16px 40px rgba(0,0,0,.38),
-    0 32px 64px rgba(0,0,0,.28);
+    0 1px 0 rgba(255,255,255,.10) inset,
+    0 -2px 0 rgba(0,0,0,.90) inset,
+    0 5px 12px rgba(0,0,0,.55),
+    0 20px 48px rgba(0,0,0,.52),
+    0 44px 80px rgba(0,0,0,.38);
+
+  --shadow-compass:
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 -1px 0 rgba(0,0,0,.75) inset,
+    0 4px 10px rgba(0,0,0,.48),
+    0 12px 28px rgba(0,0,0,.36),
+    0 24px 48px rgba(0,0,0,.24);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -203,8 +223,10 @@ header {
 .wind-card,
 .wave-card {
   margin: 0 20px 14px;
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: rgba(16,26,46,.82);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.22);
+  border-bottom: 1px solid rgba(0,0,0,.75);
   border-radius: var(--r-card);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -234,12 +256,12 @@ header {
 .compass {
   flex-shrink: 0; width: 92px; height: 92px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, rgba(0,200,240,.04), rgba(0,0,0,.4));
-  border: 1px solid var(--border-hi);
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.04), rgba(0,0,0,.5));
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.24);
+  border-bottom: 1px solid rgba(0,0,0,.72);
   position: relative;
-  box-shadow:
-    0 0 0 4px rgba(0,200,240,.03),
-    0 8px 24px rgba(0,0,0,.3) inset;
+  box-shadow: var(--shadow-compass);
 }
 
 /* Cardinal marks */
@@ -298,7 +320,7 @@ header {
 
 .wind-abbr {
   font-family: var(--disp);
-  font-size: 54px; letter-spacing: 2px; line-height: 1;
+  font-size: 36px; letter-spacing: 1px; line-height: 1;
   transition: color .4s ease;
 }
 .wind-abbr.da-terra {
@@ -335,8 +357,10 @@ header {
 
 /* Speed widget — warm coral tint */
 .spd-widget {
-  background: rgba(240,86,106,.05);
-  border: 1px solid rgba(240,86,106,.16);
+  background: rgba(240,86,106,.06);
+  border: 1px solid rgba(240,86,106,.14);
+  border-top: 1px solid rgba(240,86,106,.38);
+  border-bottom: 1px solid rgba(0,0,0,.65);
   box-shadow: var(--shadow-widget);
 }
 .spd-widget::before {
@@ -349,8 +373,10 @@ header {
 
 /* Weather widget — cool ciano tint */
 .wx-widget {
-  background: rgba(0,200,240,.04);
-  border: 1px solid rgba(0,200,240,.14);
+  background: rgba(0,200,240,.05);
+  border: 1px solid rgba(0,200,240,.12);
+  border-top: 1px solid rgba(0,200,240,.36);
+  border-bottom: 1px solid rgba(0,0,0,.65);
   box-shadow: var(--shadow-widget);
 }
 .wx-widget::before {
@@ -373,7 +399,10 @@ header {
   font-family: var(--disp);
   font-size: 26px; letter-spacing: 1px; line-height: 1;
   color: var(--text);
+  transition: color .4s ease;
 }
+.spd-val.da-terra { color: #f0566a; text-shadow: 0 0 20px rgba(240,86,106,.3); }
+.spd-val.da-mare  { color: var(--accent); text-shadow: 0 0 20px rgba(0,200,240,.25); }
 
 .spd-unit,
 .wx-cond {
@@ -407,8 +436,10 @@ header {
 
 .fi {
   flex-shrink: 0;
-  background: rgba(255,255,255,.025);
+  background: rgba(255,255,255,.03);
   border: 1px solid rgba(255,255,255,.05);
+  border-top: 1px solid rgba(255,255,255,.16);
+  border-bottom: 1px solid rgba(0,0,0,.60);
   border-radius: var(--r-chip);
   padding: 9px 10px 8px;
   text-align: center; min-width: 55px;
@@ -458,13 +489,12 @@ header {
   flex-shrink: 0;
   width: 48px; height: 48px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, rgba(0,200,240,.05), rgba(0,0,0,.4));
-  border: 1px solid var(--border-hi);
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.04), rgba(0,0,0,.5));
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.24);
+  border-bottom: 1px solid rgba(0,0,0,.72);
   position: relative;
-  box-shadow:
-    0 0 0 3px rgba(0,200,240,.04),
-    0 4px 12px rgba(0,0,0,.3) inset,
-    var(--shadow-widget);
+  box-shadow: var(--shadow-compass);
 }
 .mc-n {
   position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
@@ -522,7 +552,9 @@ header {
   display: flex; align-items: center; gap: 5px;
   padding: 4px 11px;
   background: rgba(240,86,106,.09);
-  border: 1px solid rgba(240,86,106,.22);
+  border: 1px solid rgba(240,86,106,.16);
+  border-top: 1px solid rgba(240,86,106,.36);
+  border-bottom: 1px solid rgba(0,0,0,.60);
   border-radius: var(--r-pill);
   font-family: var(--mono);
   font-size: 7px; letter-spacing: 2px;
@@ -540,7 +572,9 @@ header {
 .vbox {
   position: relative;
   border-radius: 18px; overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255,255,255,.06);
+  border-top: 1px solid rgba(255,255,255,.16);
+  border-bottom: 2px solid rgba(0,0,0,.85);
   background: #000;
   aspect-ratio: 16/9;
   box-shadow: var(--shadow-video);
@@ -745,6 +779,7 @@ async function loadAll(){
     const wDeg=Math.round(wind.current.winddirection_10m);
     const wSpd=Math.round(wind.current.windspeed_10m);
     document.getElementById('windSpd').textContent=wSpd;
+    document.getElementById('windSpd').className='spd-val '+windClass(wDeg);
     document.getElementById('windAbbr').textContent=degToCompass(wDeg);
     document.getElementById('windAbbr').className='wind-abbr '+windClass(wDeg);
     document.getElementById('windDeg').textContent=`${wDeg} °`;
