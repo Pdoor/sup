@@ -1,89 +1,816 @@
 <!DOCTYPE html>
+
 <html lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>SUP · Test Stream</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SUP · Torre Pedrera</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-:root{--deep:#060e1c;--border:rgba(255,255,255,0.08);--accent:#00d4ff;--warn:#ff4757;--text:#e8f4ff;--muted:rgba(232,244,255,0.4);--mono:'DM Mono',monospace;--display:'Bebas Neue',sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(0,133,255,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 80% 20%,rgba(0,212,255,.08),transparent 50%)}
-#app{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:env(safe-area-inset-top,20px) 0 40px}
-header{padding:20px 24px 16px;display:flex;align-items:flex-start;justify-content:space-between}
-.logo h1{font-family:var(--display);font-size:52px;letter-spacing:3px;line-height:1;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo .sub{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.htag{font-family:var(--mono);font-size:9px;color:var(--warn);text-transform:uppercase;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);padding:4px 10px;border-radius:20px;margin-top:10px}
-.intro{margin:0 24px 24px;padding:14px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14);border-radius:16px;font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.8}
-.intro strong{color:var(--accent);letter-spacing:3px;display:block;margin-bottom:4px}
-.strategy{margin:0 24px 24px}
-.s-header{display:flex;align-items:center;gap:14px;margin-bottom:12px}
-.s-num{font-family:var(--display);font-size:56px;color:rgba(255,255,255,.1);flex-shrink:0;width:54px;line-height:1}
-.s-info{flex:1}
-.s-name{font-family:var(--display);font-size:24px;letter-spacing:2px;line-height:1}
-.s-desc{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:4px}
-.s-badge{font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 9px;border-radius:20px;text-transform:uppercase;flex-shrink:0}
-.b1{color:#ff6b81;background:rgba(255,107,129,.1);border:1px solid rgba(255,107,129,.25)}
-.b2{color:#00d4ff;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2)}
-.b3{color:#a29bfe;background:rgba(162,155,254,.08);border:1px solid rgba(162,155,254,.2)}
-.vbox{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--border);background:#000;aspect-ratio:16/9}
-.vbox iframe{width:100%;height:100%;border:none;display:block}
-.vlabel{position:absolute;top:10px;left:10px;z-index:3;font-family:var(--mono);font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.65);background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:4px 10px;border-radius:20px;text-transform:uppercase;pointer-events:none}
-.s-url{margin-top:8px;padding:9px 12px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;font-family:var(--mono);font-size:7px;color:var(--muted);word-break:break-all;line-height:1.8}
-.k{color:rgba(0,212,255,.6)}
-.divider{margin:0 24px 24px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent)}
-footer{text-align:center;padding:0 24px;font-family:var(--mono);font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.15);text-transform:uppercase}
+:root {
+  --deep: #060e1c;
+  --border: rgba(255,255,255,0.08);
+  --accent: #00d4ff;
+  --warn: #ff4757;
+  --coral: #ff6b81;
+  --text: #e8f4ff;
+  --muted: rgba(232,244,255,0.4);
+  --mono: 'DM Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+  background: var(–deep);
+  color: var(–text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  }
+
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+z-index: 0;
+background:
+radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0,133,255,.12), transparent 60%),
+radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,212,255,.08), transparent 50%);
+pointer-events: none;
+}
+
+#app {
+position: relative;
+z-index: 1;
+max-width: 430px;
+margin: 0 auto;
+padding: env(safe-area-inset-top, 20px) 0 44px;
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+header {
+padding: 20px 24px 12px;
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+}
+
+.logo h1 {
+font-family: var(–display);
+font-size: 58px;
+letter-spacing: 3px;
+line-height: 1;
+background: linear-gradient(135deg, #fff, var(–accent));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+}
+
+.logo .sub {
+font-family: var(–mono);
+font-size: 9px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-top: 3px;
+}
+
+.header-right { text-align: right; }
+
+.time-display {
+font-family: var(–display);
+font-size: 38px;
+letter-spacing: 2px;
+line-height: 1;
+}
+
+.date-display {
+font-family: var(–mono);
+font-size: 9px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-top: 4px;
+}
+
+/* ── STATUS BAR ─────────────────────────────────────── */
+.status-bar {
+margin: 8px 24px 20px;
+padding: 10px 14px;
+background: rgba(255,255,255,.03);
+border: 1px solid var(–border);
+border-radius: 50px;
+display: flex;
+align-items: center;
+}
+
+.status-dot {
+width: 7px; height: 7px;
+border-radius: 50%;
+background: #00ff88;
+flex-shrink: 0;
+animation: blink 2s infinite;
+}
+
+@keyframes blink {
+0%,100% { opacity: 1; }
+50%      { opacity: .35; }
+}
+
+.status-text {
+font-family: var(–mono);
+font-size: 9px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-left: 10px;
+flex: 1;
+}
+
+.status-refresh {
+width: 28px; height: 28px;
+border-radius: 50%;
+border: none;
+background: rgba(255,255,255,.05);
+color: var(–muted);
+cursor: pointer;
+font-size: 14px;
+display: flex; align-items: center; justify-content: center;
+transition: background .2s, color .2s;
+}
+.status-refresh:active { background: rgba(255,255,255,.12); color: #fff; }
+.status-refresh.spin { animation: rotateSpin .7s linear; }
+@keyframes rotateSpin { to { transform: rotate(360deg); } }
+
+/* ── METRIC CARDS ───────────────────────────────────── */
+.metrics-row {
+margin: 0 24px 16px;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+}
+
+.metric-card {
+background: rgba(10,25,50,.65);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 16px;
+position: relative;
+overflow: hidden;
+}
+
+.metric-label {
+font-family: var(–mono);
+font-size: 8px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+display: flex;
+align-items: center;
+gap: 5px;
+margin-bottom: 10px;
+}
+
+.metric-trend {
+position: absolute;
+top: 14px; right: 14px;
+font-size: 16px;
+}
+.trend-up   { color: var(–coral); }
+.trend-flat { color: var(–muted); }
+
+.metric-value {
+font-family: var(–display);
+font-size: 52px;
+letter-spacing: 1px;
+line-height: 1;
+}
+
+.metric-unit {
+font-family: var(–mono);
+font-size: 9px;
+letter-spacing: 2px;
+color: var(–muted);
+margin-top: 6px;
+}
+
+.metric-bar {
+margin-top: 14px;
+height: 2px;
+background: rgba(255,255,255,.05);
+border-radius: 2px;
+overflow: hidden;
+}
+.metric-bar-fill {
+height: 100%;
+border-radius: 2px;
+background: linear-gradient(90deg, var(–accent), rgba(0,212,255,.35));
+transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── WIND CARD ──────────────────────────────────────── */
+.wind-card {
+margin: 0 24px 16px;
+background: rgba(10,25,50,.65);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 20px;
+}
+
+.card-label {
+font-family: var(–mono);
+font-size: 8px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-bottom: 16px;
+}
+
+/* three-column row: compass | dir-text | weather */
+.wind-main {
+display: flex;
+align-items: center;
+gap: 14px;
+margin-bottom: 20px;
+}
+
+/* Compass */
+.compass {
+flex-shrink: 0;
+width: 96px; height: 96px;
+border-radius: 50%;
+border: 1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.3);
+position: relative;
+}
+
+.c-n {
+position: absolute;
+top: 6px; left: 50%;
+transform: translateX(-50%);
+font-family: var(–mono);
+font-size: 9px;
+color: var(–muted);
+letter-spacing: 1px;
+}
+
+.c-needle {
+position: absolute;
+top: 50%; left: 50%;
+width: 2px; height: 46px;
+margin-left: -1px;
+margin-top: -38px;
+transform-origin: bottom center;
+transition: transform 1s cubic-bezier(.4,0,.2,1);
+}
+.c-tip  { height: 30px; background: linear-gradient(to bottom, var(–coral), rgba(255,107,129,.25)); border-radius: 2px 2px 0 0; }
+.c-tail { height: 16px; background: rgba(255,255,255,.15); border-radius: 0 0 2px 2px; }
+
+.c-dot {
+position: absolute;
+top: 50%; left: 50%;
+width: 6px; height: 6px;
+border-radius: 50%;
+background: #fff;
+transform: translate(-50%,-50%);
+}
+
+/* Direction label */
+.wind-dir-info { flex: 1; min-width: 0; }
+
+.wind-abbr {
+font-family: var(–display);
+font-size: 52px;
+letter-spacing: 2px;
+line-height: 1;
+color: var(–coral);
+}
+
+.wind-deg {
+font-family: var(–mono);
+font-size: 11px;
+letter-spacing: 2px;
+color: var(–muted);
+margin-top: 5px;
+}
+
+/* ── WEATHER WIDGET (NEW) ───────────────────────────── */
+.wx-widget {
+flex-shrink: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 5px;
+padding: 12px 12px 10px;
+background: rgba(0,212,255,.035);
+border: 1px solid rgba(0,212,255,.12);
+border-radius: 16px;
+min-width: 68px;
+position: relative;
+overflow: hidden;
+}
+
+.wx-widget::before {
+content: ‘’;
+position: absolute;
+top: -20px; right: -20px;
+width: 60px; height: 60px;
+border-radius: 50%;
+background: rgba(0,212,255,.05);
+pointer-events: none;
+}
+
+.wx-icon {
+font-size: 26px;
+line-height: 1;
+filter: drop-shadow(0 0 6px rgba(0,212,255,.3));
+}
+
+.wx-temp {
+font-family: var(–display);
+font-size: 24px;
+letter-spacing: 1px;
+color: #fff;
+line-height: 1;
+}
+
+.wx-cond {
+font-family: var(–mono);
+font-size: 6.5px;
+letter-spacing: 1.5px;
+color: var(–muted);
+text-transform: uppercase;
+text-align: center;
+line-height: 1.5;
+white-space: pre-line;
+}
+
+/* ── FORECAST ───────────────────────────────────────── */
+.forecast-sep {
+height: 1px;
+background: rgba(255,255,255,.06);
+margin-bottom: 16px;
+}
+
+.forecast-label {
+font-family: var(–mono);
+font-size: 8px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-bottom: 10px;
+}
+
+.forecast-scroll {
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+scrollbar-width: none;
+}
+.forecast-scroll::-webkit-scrollbar { display: none; }
+
+.forecast-row {
+display: flex;
+gap: 8px;
+padding-bottom: 2px;
+}
+
+.fi {
+flex-shrink: 0;
+background: rgba(0,0,0,.3);
+border: 1px solid rgba(255,255,255,.06);
+border-radius: 12px;
+padding: 8px 10px;
+text-align: center;
+min-width: 60px;
+}
+
+.fi-time {
+font-family: var(–mono);
+font-size: 7px;
+letter-spacing: 1px;
+color: var(–muted);
+margin-bottom: 5px;
+}
+
+.fi-dir {
+font-family: var(–display);
+font-size: 21px;
+letter-spacing: 1px;
+color: var(–coral);
+line-height: 1;
+}
+.fi-dir.calm { color: var(–accent); }
+
+.fi-deg {
+font-family: var(–mono);
+font-size: 7px;
+letter-spacing: 1px;
+color: rgba(232,244,255,.22);
+margin-top: 3px;
+}
+
+/* ── WAVE CARD ──────────────────────────────────────── */
+.wave-card {
+margin: 0 24px 16px;
+background: rgba(10,25,50,.65);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 20px;
+display: flex;
+align-items: center;
+gap: 14px;
+}
+
+.wave-svg { flex-shrink: 0; }
+.wave-svg svg { width: 68px; height: 38px; display: block; }
+
+.wave-info { flex: 1; }
+
+.wave-height {
+font-family: var(–display);
+font-size: 42px;
+letter-spacing: 2px;
+line-height: 1;
+}
+
+.wave-sub {
+font-family: var(–mono);
+font-size: 8px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-top: 4px;
+}
+
+.wave-dir-box { text-align: right; }
+
+.wave-dir-label {
+font-family: var(–mono);
+font-size: 7px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+margin-bottom: 3px;
+}
+
+.wave-dir-val {
+font-family: var(–display);
+font-size: 38px;
+letter-spacing: 2px;
+line-height: 1;
+}
+
+/* ── WEBCAM ─────────────────────────────────────────── */
+.webcam-section { margin: 0 24px 16px; }
+
+.webcam-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 12px;
+}
+
+.webcam-label {
+font-family: var(–mono);
+font-size: 8px;
+letter-spacing: 3px;
+color: var(–muted);
+text-transform: uppercase;
+}
+
+.live-badge {
+display: flex;
+align-items: center;
+gap: 5px;
+padding: 3px 10px;
+background: rgba(255,71,87,.12);
+border: 1px solid rgba(255,71,87,.28);
+border-radius: 20px;
+font-family: var(–mono);
+font-size: 7px;
+letter-spacing: 2px;
+color: var(–warn);
+text-transform: uppercase;
+}
+
+.live-dot {
+width: 5px; height: 5px;
+border-radius: 50%;
+background: var(–warn);
+animation: blink 1.4s infinite;
+}
+
+.webcam-box {
+position: relative;
+border-radius: 18px;
+overflow: hidden;
+border: 1px solid var(–border);
+background: #000;
+aspect-ratio: 16/9;
+}
+
+.webcam-box iframe {
+width: 100%; height: 100%;
+border: none;
+display: block;
+}
+
+.webcam-loc {
+position: absolute;
+top: 10px; left: 10px;
+z-index: 3;
+font-family: var(–mono);
+font-size: 7px;
+letter-spacing: 2px;
+color: rgba(255,255,255,.7);
+background: rgba(0,0,0,.55);
+backdrop-filter: blur(8px);
+-webkit-backdrop-filter: blur(8px);
+padding: 4px 10px;
+border-radius: 20px;
+text-transform: uppercase;
+pointer-events: none;
+}
+
+/* ── FOOTER ─────────────────────────────────────────── */
+footer {
+text-align: center;
+padding: 16px 24px 0;
+font-family: var(–mono);
+font-size: 7px;
+letter-spacing: 3px;
+color: rgba(255,255,255,.1);
+text-transform: uppercase;
+}
 </style>
+
 </head>
-<body><div id="app">
-<header>
-  <div class="logo"><h1>SUP</h1><div class="sub">Torre · Test Stream</div></div>
-  <div class="htag">⚠ TEST</div>
-</header>
-<div class="intro"><strong>ISTRUZIONI</strong>Scorri e controlla quale strategia mostra il video live.<br>Dimmi il numero (01, 02 o 03) e integro solo quella nell'app.</div>
+<body>
+<div id="app">
 
-<div class="strategy">
-  <div class="s-header">
-    <div class="s-num">01</div>
-    <div class="s-info"><div class="s-name" style="color:#ff6b81">YouTube NoCookie</div><div class="s-desc">Embed ufficiale · privacy-enhanced mode</div></div>
-    <div class="s-badge b1">official</div>
+  <!-- HEADER -->
+
+  <header>
+    <div class="logo">
+      <h1>SUP</h1>
+      <div class="sub">Torre Pedrera · Adriatico</div>
+    </div>
+    <div class="header-right">
+      <div class="time-display" id="clock">--:--</div>
+      <div class="date-display" id="dateDisp">--- - ---</div>
+    </div>
+  </header>
+
+  <!-- STATUS -->
+
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <div class="status-text" id="statusText">CARICAMENTO…</div>
+    <button class="status-refresh" id="refreshBtn" onclick="loadAll()" aria-label="Aggiorna">↻</button>
   </div>
-  <div class="vbox">
-    <iframe src="https://www.youtube-nocookie.com/embed/1A2PUj7SS5o?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3" allow="autoplay;encrypted-media;picture-in-picture" allowfullscreen playsinline referrerpolicy="no-referrer"></iframe>
-    <div class="vlabel">01 · youtube-nocookie.com</div>
+
+  <!-- METRICS -->
+
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">〜 ONDE</div>
+      <div class="metric-trend trend-flat" id="waveTrend">—</div>
+      <div class="metric-value" id="waveVal">--</div>
+      <div class="metric-unit">centimetri</div>
+      <div class="metric-bar"><div class="metric-bar-fill" id="waveBar" style="width:5%"></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">≋ VENTO</div>
+      <div class="metric-trend trend-up" id="windTrend">▲</div>
+      <div class="metric-value" id="windSpd">--</div>
+      <div class="metric-unit">km/h</div>
+      <div class="metric-bar"><div class="metric-bar-fill" id="windBar" style="width:5%"></div></div>
+    </div>
   </div>
-  <div class="s-url"><span class="k">host </span>www.youtube-nocookie.com<br><span class="k">params </span>autoplay=1 · mute=1 · playsinline=1 · modestbranding=1</div>
+
+  <!-- WIND DIRECTION CARD -->
+
+  <div class="wind-card">
+    <div class="card-label">DIREZIONE VENTO</div>
+
+```
+<div class="wind-main">
+  <!-- Compass rose -->
+  <div class="compass">
+    <div class="c-n">N</div>
+    <div class="c-needle" id="needle">
+      <div class="c-tip"></div>
+      <div class="c-tail"></div>
+    </div>
+    <div class="c-dot"></div>
+  </div>
+
+  <!-- Dir label -->
+  <div class="wind-dir-info">
+    <div class="wind-abbr" id="windAbbr">---</div>
+    <div class="wind-deg" id="windDeg">--- °</div>
+  </div>
+
+  <!-- ── WEATHER WIDGET (NEW) ── -->
+  <div class="wx-widget">
+    <div class="wx-icon" id="wxIcon">⋯</div>
+    <div class="wx-temp" id="wxTemp">--°</div>
+    <div class="wx-cond" id="wxCond">---</div>
+  </div>
 </div>
-<div class="divider"></div>
 
-<div class="strategy">
-  <div class="s-header">
-    <div class="s-num">02</div>
-    <div class="s-info"><div class="s-name" style="color:#00d4ff">Invidious · Yewtu</div><div class="s-desc">Proxy open-source · istanza yewtu.be</div></div>
-    <div class="s-badge b2">invidious</div>
+<!-- Forecast -->
+<div class="forecast-sep"></div>
+<div class="forecast-label">EVOLUZIONE PROSSIME ORE</div>
+<div class="forecast-scroll">
+  <div class="forecast-row" id="forecastRow">
+    <!-- populated by JS -->
   </div>
-  <div class="vbox">
-    <iframe src="https://yewtu.be/embed/1A2PUj7SS5o?autoplay=1&muted=1&listen=0" allow="autoplay;encrypted-media" allowfullscreen playsinline referrerpolicy="no-referrer"></iframe>
-    <div class="vlabel">02 · yewtu.be</div>
-  </div>
-  <div class="s-url"><span class="k">host </span>yewtu.be<br><span class="k">params </span>autoplay=1 · muted=1 · listen=0</div>
 </div>
-<div class="divider"></div>
+```
 
-<div class="strategy">
-  <div class="s-header">
-    <div class="s-num">03</div>
-    <div class="s-info"><div class="s-name" style="color:#a29bfe">Invidious · Nadeko</div><div class="s-desc">Proxy open-source · istanza inv.nadeko.net</div></div>
-    <div class="s-badge b3">invidious</div>
   </div>
-  <div class="vbox">
-    <iframe src="https://inv.nadeko.net/embed/1A2PUj7SS5o?autoplay=1&muted=1" allow="autoplay;encrypted-media" allowfullscreen playsinline referrerpolicy="no-referrer"></iframe>
-    <div class="vlabel">03 · inv.nadeko.net</div>
+
+  <!-- WAVE CARD -->
+
+  <div class="wave-card">
+    <div class="wave-svg">
+      <svg viewBox="0 0 70 38" fill="none">
+        <path stroke="#00d4ff" stroke-width="2" stroke-linecap="round" fill="none">
+          <animate attributeName="d" dur="2.2s" repeatCount="indefinite"
+            values="M0 19 Q8 10 16 19 Q24 28 32 19 Q40 10 48 19 Q56 28 64 19;
+                    M0 19 Q8 28 16 19 Q24 10 32 19 Q40 28 48 19 Q56 10 64 19;
+                    M0 19 Q8 10 16 19 Q24 28 32 19 Q40 10 48 19 Q56 28 64 19"/>
+        </path>
+      </svg>
+    </div>
+    <div class="wave-info">
+      <div class="wave-height" id="waveHbig">-- CM</div>
+      <div class="wave-sub">SWELL HEIGHT</div>
+    </div>
+    <div class="wave-dir-box">
+      <div class="wave-dir-label">DIR. ONDE</div>
+      <div class="wave-dir-val" id="waveDirVal">--</div>
+    </div>
   </div>
-  <div class="s-url"><span class="k">host </span>inv.nadeko.net<br><span class="k">params </span>autoplay=1 · muted=1</div>
+
+  <!-- WEBCAM — strategy 01: YouTube NoCookie (only embed that works reliably) -->
+
+  <div class="webcam-section">
+    <div class="webcam-header">
+      <div class="webcam-label">WEBCAM LIVE</div>
+      <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    </div>
+    <div class="webcam-box">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/1A2PUj7SS5o?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen
+        playsinline
+        referrerpolicy="no-referrer">
+      </iframe>
+      <div class="webcam-loc">TORRE PEDRERA</div>
+    </div>
+  </div>
+
+  <footer>SUP · Torre Pedrera · Adriatico</footer>
 </div>
 
-<footer>Dimmi quale numero funziona → integro nell'app</footer>
-</div></body></html>
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+// Coordinates: Torre Pedrera, Rimini, Italy
+const LAT = 44.07;
+const LON = 12.62;
+
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+const DAYS   = ['DOM','LUN','MAR','MER','GIO','VEN','SAB'];
+const MONTHS = ['GEN','FEB','MAR','APR','MAG','GIU','LUG','AGO','SET','OTT','NOV','DIC'];
+
+function tickClock() {
+  const n = new Date();
+  const hh = String(n.getHours()).padStart(2,'0');
+  const mm = String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${hh}:${mm}`;
+  document.getElementById('dateDisp').textContent =
+    `${DAYS[n.getDay()]} ${n.getDate()} ${MONTHS[n.getMonth()]}`;
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function degToCompass(deg) {
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE',
+                'S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  return dirs[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16];
+}
+
+function wmoInfo(code) {
+  if (code === 0)        return { icon: '☀️',  label: 'SOLEGGIATO' };
+  if (code <= 1)        return { icon: '🌤️',  label: 'POCO\nNUVOLOSO' };
+  if (code <= 2)        return { icon: '⛅',  label: 'PARZ.\nNUVOLOSO' };
+  if (code === 3)        return { icon: '☁️',  label: 'COPERTO' };
+  if (code <= 48)        return { icon: '🌫️', label: 'NEBBIA' };
+  if (code <= 57)        return { icon: '🌦️', label: 'PIOVIGGINE' };
+  if (code <= 67)        return { icon: '🌧️', label: 'PIOGGIA' };
+  if (code <= 77)        return { icon: '🌨️', label: 'NEVE' };
+  if (code <= 82)        return { icon: '🌦️', label: 'ROVESCI' };
+  return                        { icon: '⛈️', label: 'TEMPORALE' };
+}
+
+// ── MAIN LOAD ────────────────────────────────────────────────────────────────
+async function loadAll() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spin');
+  document.getElementById('statusText').textContent = 'AGGIORNAMENTO…';
+
+  try {
+    const [marineRes, windRes, wxRes] = await Promise.all([
+      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction&wind_speed_unit=kmh&timezone=Europe/Rome`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&timezone=Europe/Rome`)
+    ]);
+
+    const [marine, wind, wx] = await Promise.all([
+      marineRes.json(), windRes.json(), wxRes.json()
+    ]);
+
+    // ── Wind ──
+    const wDeg  = Math.round(wind.current.winddirection_10m);
+    const wSpd  = Math.round(wind.current.windspeed_10m);
+    const wAbbr = degToCompass(wDeg);
+
+    document.getElementById('windAbbr').textContent = wAbbr;
+    document.getElementById('windDeg').textContent  = `${wDeg} °`;
+    document.getElementById('windSpd').textContent  = wSpd;
+    document.getElementById('windBar').style.width  = Math.min(wSpd / 60 * 100, 100) + '%';
+    document.getElementById('needle').style.transform = `rotate(${wDeg}deg)`;
+
+    const trendEl = document.getElementById('windTrend');
+    trendEl.textContent = wSpd > 8 ? '▲' : '—';
+    trendEl.className   = wSpd > 8 ? 'metric-trend trend-up' : 'metric-trend trend-flat';
+
+    // ── Waves ──
+    if (marine && marine.current) {
+      const wh  = marine.current.wave_height;
+      const wcm = Math.round(wh * 100);
+      const wd  = marine.current.wave_direction;
+      document.getElementById('waveVal').textContent    = wcm;
+      document.getElementById('waveHbig').textContent   = `${wcm} CM`;
+      document.getElementById('waveDirVal').textContent = degToCompass(wd);
+      document.getElementById('waveBar').style.width    = Math.min(wcm / 150 * 100, 100) + '%';
+    }
+
+    // ── Weather widget ──
+    const temp = Math.round(wx.current.temperature_2m);
+    const { icon, label } = wmoInfo(wx.current.weathercode);
+    document.getElementById('wxIcon').textContent = icon;
+    document.getElementById('wxTemp').textContent = `${temp}°`;
+    document.getElementById('wxCond').textContent = label;
+
+    // ── Hourly forecast ──
+    const now    = new Date();
+    const times  = wind.hourly.time;
+    const wdirs  = wind.hourly.winddirection_10m;
+    const row    = document.getElementById('forecastRow');
+    row.innerHTML = '';
+    let count = 0;
+
+    for (let i = 0; i < times.length && count < 8; i++) {
+      const t = new Date(times[i]);
+      if (t > now) {
+        const abbr  = degToCompass(wdirs[i]);
+        const isN   = wdirs[i] < 15 || wdirs[i] > 345;
+        const item  = document.createElement('div');
+        item.className = 'fi';
+        item.innerHTML = `
+          <div class="fi-time">${String(t.getHours()).padStart(2,'0')}:00</div>
+          <div class="fi-dir${isN ? ' calm' : ''}">${abbr}</div>
+          <div class="fi-deg">${Math.round(wdirs[i])}°</div>
+        `;
+        row.appendChild(item);
+        count++;
+      }
+    }
+
+    // ── Status ──
+    const n   = new Date();
+    const hh2 = String(n.getHours()).padStart(2,'0');
+    const mm2 = String(n.getMinutes()).padStart(2,'0');
+    document.getElementById('statusText').textContent = `AGGIORNATO · ${hh2}:${mm2}`;
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('statusText').textContent = 'ERRORE CONNESSIONE';
+  }
+
+  btn.classList.remove('spin');
+}
+
+loadAll();
+setInterval(loadAll, 5 * 60 * 1000); // auto-refresh ogni 5 min
+</script>
+
+</body>
+</html>
