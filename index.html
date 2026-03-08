@@ -763,6 +763,20 @@ header {
   color: rgba(180,255,220,.35); text-transform: uppercase; margin-top: 3px;
 }
 
+.wave-data-row {
+  display: flex; align-items: flex-start; gap: 10px;
+}
+
+.wave-data-col {
+  display: flex; flex-direction: column;
+}
+
+.wave-data-sep {
+  width: 1px; align-self: stretch;
+  background: rgba(0,210,120,.15);
+  margin: 2px 0;
+}
+
 .wave-period-row {
   display: flex; align-items: baseline; gap: 3px;
   margin-top: 3px;
@@ -969,13 +983,20 @@ footer {
       </svg>
     </div>
     <div class="wave-info">
-      <div class="wave-height" id="waveHbig">-- CM</div>
-      <div class="wave-sub">ALTEZZA</div>
-      <div class="wave-period-row">
-        <div class="wave-period-val" id="wavePeriod">--</div>
-        <div class="wave-period-unit">sec</div>
+      <div class="wave-data-row">
+        <div class="wave-data-col">
+          <div class="wave-height" id="waveHbig">-- CM</div>
+          <div class="wave-sub">ALTEZZA</div>
+        </div>
+        <div class="wave-data-sep"></div>
+        <div class="wave-data-col">
+          <div class="wave-period-row">
+            <div class="wave-period-val" id="wavePeriod">--</div>
+            <div class="wave-period-unit">sec</div>
+          </div>
+          <div class="wave-period-label">PERIODO</div>
+        </div>
       </div>
-      <div class="wave-period-label">PERIODO</div>
     </div>
     <!-- mini bussola direzione onde -->
     <div class="mini-compass">
