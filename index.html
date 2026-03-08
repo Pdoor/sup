@@ -66,7 +66,7 @@ body::before {
 #app {
   position: relative; z-index: 1;
   max-width: 430px; margin: 0 auto;
-  padding: env(safe-area-inset-top, 24px) 0 52px;
+  padding: env(safe-area-inset-top, 16px) 0 36px;
 }
 
 /* ── Staggered entry animation ──────────────────────── */
@@ -84,13 +84,13 @@ header        { animation: rise .55s cubic-bezier(.22,1,.36,1) both; }
    HEADER
    ═══════════════════════════════════════════════════════ */
 header {
-  padding: 18px 22px 10px;
+  padding: 10px 18px 6px;
   display: flex; align-items: flex-start; justify-content: space-between;
 }
 
 .logo h1 {
   font-family: var(--disp);
-  font-size: 44px; letter-spacing: 4px; line-height: 1;
+  font-size: 36px; letter-spacing: 3px; line-height: 1;
   background: linear-gradient(140deg, #ffffff 30%, var(--accent) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -113,7 +113,7 @@ header {
 
 .time-display {
   font-family: var(--disp);
-  font-size: 36px; letter-spacing: 2px; line-height: 1;
+  font-size: 28px; letter-spacing: 2px; line-height: 1;
   color: var(--text);
   /* 3D text shadow: stessa logica — highlight + spessore + glow */
   text-shadow:
@@ -134,7 +134,7 @@ header {
    STATUS BAR
    ═══════════════════════════════════════════════════════ */
 .status-bar {
-  margin: 2px 22px 10px;
+  margin: 2px 14px 8px;
   padding: 6px 12px 6px 14px;
   background: rgba(255,255,255,.028);
   border: 1px solid rgba(255,255,255,.06);
@@ -253,7 +253,7 @@ header {
    ═══════════════════════════════════════════════════════ */
 .wind-card,
 .wave-card {
-  margin: 0 20px 9px;
+  margin: 0 14px 7px;
   border: 1px solid rgba(255,255,255,.07);
   border-top: 1px solid rgba(255,255,255,.22);
   border-bottom: 1px solid rgba(0,0,0,.75);
@@ -284,28 +284,67 @@ header {
     0 40px 72px rgba(0,0,0,.32);
 }
 
-.wind-card { padding: 22px 20px 18px; }
-.wave-card { padding: 20px; display: flex; align-items: center; gap: 16px; }
+.wind-card { padding: 14px 16px 13px; }
+.wave-card { padding: 13px 16px; display: flex; align-items: center; gap: 12px; }
 
 /* ── Section label ─────────────────────────────────── */
 .card-label {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
   color: var(--text-3); text-transform: uppercase;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 /* ═══════════════════════════════════════════════════════
-   WIND MAIN — 4-column flex
+   WIND MAIN — 2-row layout
+   Row 1: compass + direzione/DA/VA
+   Row 2: speed widget + weather widget
    ═══════════════════════════════════════════════════════ */
 .wind-main {
-  display: flex; align-items: center; gap: 11px;
-  margin-bottom: 22px;
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 14px;
+}
+
+.wind-top-row {
+  display: flex; align-items: center; gap: 14px;
+}
+
+.wind-widgets-row {
+  display: flex; gap: 8px;
+}
+
+.wind-widgets-row .spd-widget,
+.wind-widgets-row .wx-widget {
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  min-width: 0;
+}
+
+.wind-widgets-row .spd-icon,
+.wind-widgets-row .wx-icon {
+  font-size: 18px; flex-shrink: 0;
+}
+
+.wind-widgets-row .spd-val,
+.wind-widgets-row .wx-temp {
+  font-size: 24px;
+}
+
+.wind-widgets-row .spd-unit,
+.wind-widgets-row .wx-cond {
+  font-size: 6.5px; letter-spacing: 1.5px;
+  text-align: left; white-space: pre-line;
+  margin-left: auto;
+  padding-left: 4px;
 }
 
 /* ── Compass ────────────────────────────────────────── */
 .compass {
-  flex-shrink: 0; width: 92px; height: 92px;
+  flex-shrink: 0; width: 78px; height: 78px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.04), rgba(0,0,0,.5));
   border: 1px solid rgba(255,255,255,.07);
@@ -339,21 +378,21 @@ header {
 
 .c-needle {
   position: absolute; top: 50%; left: 50%;
-  width: 2px; height: 44px;
-  margin-left: -1px; margin-top: -36px;
+  width: 2px; height: 36px;
+  margin-left: -1px; margin-top: -29px;
   transform-origin: bottom center;
   transition: transform 1.1s cubic-bezier(.34,1.56,.64,1);
 }
 
 .c-tip {
-  height: 28px;
+  height: 22px;
   background: linear-gradient(to bottom, #f0566a, rgba(240,86,106,.15));
   border-radius: 2px 2px 0 0;
   box-shadow: 0 0 10px rgba(240,86,106,.4);
 }
 
 .c-tail {
-  height: 16px;
+  height: 14px;
   background: rgba(255,255,255,.1);
   border-radius: 0 0 2px 2px;
 }
@@ -371,7 +410,7 @@ header {
 
 .wind-abbr {
   font-family: var(--disp);
-  font-size: 36px; letter-spacing: 1px; line-height: 1;
+  font-size: 30px; letter-spacing: 1px; line-height: 1;
   transition: color .4s ease;
 }
 .wind-abbr.da-terra {
@@ -385,14 +424,14 @@ header {
 
 .wind-deg {
   font-family: var(--mono);
-  font-size: 10px; letter-spacing: 2px;
-  color: var(--text-3); margin-top: 6px;
+  font-size: 9px; letter-spacing: 2px;
+  color: var(--text-3); margin-top: 4px;
 }
 
 .wind-from-row,
 .wind-to-row {
-  display: flex; align-items: baseline; gap: 5px;
-  margin-top: 6px;
+  display: flex; align-items: baseline; gap: 4px;
+  margin-top: 4px;
 }
 
 .wind-from-label,
@@ -503,15 +542,15 @@ header {
    FORECAST STRIP
    ═══════════════════════════════════════════════════════ */
 .forecast-sep {
-  height: 1px; margin-bottom: 18px;
+  height: 1px; margin-bottom: 10px;
   background: linear-gradient(90deg, transparent, var(--border-hi), transparent);
 }
 
 .forecast-label {
   font-family: var(--mono);
-  font-size: 7.5px; letter-spacing: 4px;
+  font-size: 7px; letter-spacing: 4px;
   color: var(--text-3); text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .forecast-scroll {
@@ -528,8 +567,8 @@ header {
   border-top: 1px solid rgba(255,255,255,.16);
   border-bottom: 1px solid rgba(0,0,0,.60);
   border-radius: var(--r-chip);
-  padding: 9px 10px 8px;
-  text-align: center; min-width: 55px;
+  padding: 7px 8px 6px;
+  text-align: center; min-width: 50px;
   box-shadow: var(--shadow-chip);
   transition: background .2s, border-color .2s;
 }
@@ -584,7 +623,7 @@ header {
 
 .wave-height {
   font-family: var(--disp);
-  font-size: 32px; letter-spacing: 2px; line-height: 1;
+  font-size: 26px; letter-spacing: 2px; line-height: 1;
   color: #e8fff4;
   text-shadow:
     0 1px 0 rgba(255,255,255,.14),
@@ -596,7 +635,7 @@ header {
 /* ── Mini compass (onde) ────────────────────────────── */
 .mini-compass {
   flex-shrink: 0;
-  width: 48px; height: 48px;
+  width: 40px; height: 40px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(0,210,120,.06), rgba(0,0,0,.55));
   border: 1px solid rgba(0,210,120,.12);
@@ -642,7 +681,7 @@ header {
 
 .wave-dir-val {
   font-family: var(--disp);
-  font-size: 38px; letter-spacing: 2px; line-height: 1;
+  font-size: 30px; letter-spacing: 2px; line-height: 1;
   color: #00d278;
   text-shadow:
     0 1px 0 rgba(255,255,255,.12),
@@ -654,7 +693,7 @@ header {
 /* ═══════════════════════════════════════════════════════
    WEBCAM
    ═══════════════════════════════════════════════════════ */
-.webcam-section { margin: 0 20px 8px; }
+.webcam-section { margin: 0 14px 8px; }
 
 .webcam-header {
   display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
@@ -747,40 +786,44 @@ footer {
     <div class="card-label">DIREZIONE VENTO</div>
     <div class="wind-main">
 
-      <div class="compass">
-        <div class="c-n">N</div>
-        <div class="c-needle" id="needle">
-          <div class="c-tip"></div>
-          <div class="c-tail"></div>
+      <!-- ROW 1: compass + direzione + DA/VA -->
+      <div class="wind-top-row">
+        <div class="compass">
+          <div class="c-n">N</div>
+          <div class="c-needle" id="needle">
+            <div class="c-tip"></div>
+            <div class="c-tail"></div>
+          </div>
+          <div class="c-dot"></div>
         </div>
-        <div class="c-dot"></div>
+
+        <div class="wind-dir-info">
+          <div class="wind-abbr da-terra" id="windAbbr">---</div>
+          <div class="wind-deg" id="windDeg">--- °</div>
+          <div class="wind-from-row">
+            <span class="wind-from-label">DA</span>
+            <span class="wind-from-val" id="windFrom">---</span>
+          </div>
+          <div class="wind-to-row">
+            <span class="wind-to-label">VA</span>
+            <span class="wind-to-val" id="windTo">---</span>
+          </div>
+        </div>
       </div>
 
-      <div class="wind-dir-info">
-        <div class="wind-abbr da-terra" id="windAbbr">---</div>
-        <div class="wind-deg" id="windDeg">--- °</div>
-        <div class="wind-from-row">
-          <span class="wind-from-label">DA</span>
-          <span class="wind-from-val" id="windFrom">---</span>
+      <!-- ROW 2: speed + weather widgets -->
+      <div class="wind-widgets-row">
+        <div class="spd-widget">
+          <div class="spd-icon">💨</div>
+          <div class="spd-val" id="windSpd">--</div>
+          <div class="spd-unit">km/h</div>
         </div>
-        <div class="wind-to-row">
-          <span class="wind-to-label">VA</span>
-          <span class="wind-to-val" id="windTo">---</span>
+
+        <div class="wx-widget">
+          <div class="wx-icon" id="wxIcon">⋯</div>
+          <div class="wx-temp" id="wxTemp">--°</div>
+          <div class="wx-cond" id="wxCond">---</div>
         </div>
-      </div>
-
-      <!-- wind speed widget — prima del meteo -->
-      <div class="spd-widget">
-        <div class="spd-icon">💨</div>
-        <div class="spd-val" id="windSpd">--</div>
-        <div class="spd-unit">km/h</div>
-      </div>
-
-      <!-- ★ WEATHER WIDGET (solo aggiunta, tutto il resto invariato) -->
-      <div class="wx-widget">
-        <div class="wx-icon" id="wxIcon">⋯</div>
-        <div class="wx-temp" id="wxTemp">--°</div>
-        <div class="wx-cond" id="wxCond">---</div>
       </div>
 
     </div>
@@ -971,7 +1014,7 @@ async function loadAll(){
 
     /* status */
     const n=new Date();
-    document.getElementById('statusText').textContent=`AGGIORNATO · \${String(n.getHours()).padStart(2,'0')}:\${String(n.getMinutes()).padStart(2,'0')}`;
+    document.getElementById('statusText').textContent=`AGGIORNATO · ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
     document.querySelector('.status-dot').classList.remove('error');
     setLoading(false);
   }catch(e){
