@@ -211,7 +211,7 @@ header {
 .status-text {
   font-family: var(--mono);
   font-size: 8.5px; letter-spacing: 3px;
-  color: var(--text-3); text-transform: uppercase; flex: 1;
+  color: rgba(220,235,255,.62); text-transform: uppercase; flex: 1;
 }
 
 .status-refresh {
@@ -324,13 +324,23 @@ header {
 }
 
 .wind-card { padding: 10px 14px 10px; }
-.wave-card { padding: 9px 14px; display: flex; align-items: center; gap: 10px; }
+.wave-card { padding: 9px 14px 9px; display: flex; flex-direction: column; gap: 6px; }
+
+.wave-card-label {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 4px;
+  color: rgba(0,210,120,.70); text-transform: uppercase;
+}
+
+.wave-card-inner {
+  display: flex; align-items: center; gap: 10px;
+}
 
 /* ── Section label ─────────────────────────────────── */
 .card-label {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
-  color: var(--text-3); text-transform: uppercase;
+  color: rgba(220,235,255,.62); text-transform: uppercase;
   margin-bottom: 8px;
 }
 
@@ -617,7 +627,7 @@ header {
 .forecast-label {
   font-family: var(--mono);
   font-size: 6.5px; letter-spacing: 3px;
-  color: var(--text-3); text-transform: uppercase;
+  color: rgba(220,235,255,.62); text-transform: uppercase;
   margin-bottom: 5px;
 }
 
@@ -764,7 +774,7 @@ header {
 }
 
 .wave-data-row {
-  display: flex; align-items: flex-start; gap: 10px;
+  display: flex; align-items: center; gap: 8px;
 }
 
 .wave-data-col {
@@ -801,21 +811,83 @@ header {
 .wave-period-label {
   font-family: var(--mono);
   font-size: 7px; letter-spacing: 3px;
-  color: rgba(180,255,220,.35); text-transform: uppercase;
+  color: rgba(180,255,220,.55); text-transform: uppercase;
   margin-top: 2px;
 }
 
+/* ── Marea: istogramma inline nel box Onde ─────────── */
+.tide-histo {
+  display: flex; align-items: flex-end; gap: 2px;
+  height: 14px; margin-top: 2px;
+}
+
+/* barre: altezze fisse crescenti — ordine fisico sempre uguale */
+.th-bar {
+  width: 5px; border-radius: 2px 2px 1px 1px;
+  background: rgba(0,210,120,.10);
+  border: 1px solid rgba(0,210,120,.14);
+  transition: background .5s, border-color .5s, box-shadow .5s, opacity .5s;
+  flex-shrink: 0;
+}
+.th-bar:nth-child(1) { height: 4px; }
+.th-bar:nth-child(2) { height: 8px; }
+.th-bar:nth-child(3) { height: 13px; }
+
+/* accesa piena */
+.th-bar.on {
+  background: rgba(0,210,120,.72);
+  border-color: #00d278;
+  box-shadow: 0 0 6px rgba(0,210,120,.45);
+}
+/* accesa smorzata (barra top in calante) */
+.th-bar.on-dim {
+  background: rgba(0,210,120,.36);
+  border-color: rgba(0,210,120,.55);
+  box-shadow: none;
+}
+/* hint: barra successiva lampeggia (crescente) */
+.th-bar.hint {
+  background: rgba(0,210,120,.18);
+  border-color: rgba(0,210,120,.32);
+  animation: thHint 1.8s ease-in-out infinite;
+}
+@keyframes thHint {
+  0%,100% { opacity:.4; } 60% { opacity:1; }
+}
+
+/* ── vecchi tide-seg nascosti ── */
+.tide-seg { display: none; }
+.tide-val  { display: none; }
+.tide-card { display: none; }
+
+/* ── Direzione onde ─────────────────────────────────── */
 .wave-dir-box { text-align: right; }
 
 .wave-dir-label {
   font-family: var(--mono);
   font-size: 7px; letter-spacing: 3px;
-  color: rgba(180,255,220,.35); text-transform: uppercase; margin-bottom: 3px;
+  color: rgba(180,255,220,.72); text-transform: uppercase; margin-bottom: 3px;
 }
 
 .wave-dir-val {
   font-family: var(--disp);
   font-size: 22px; letter-spacing: 1px; line-height: 1;
+  color: #00d278;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.12),
+    0 2px 0 rgba(0,0,0,.70),
+    0 4px 14px rgba(0,0,0,.35),
+    0 0 28px rgba(0,210,120,.30);
+}
+.wave-dir-val.da-terra {
+  color: #f0566a;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.12),
+    0 2px 0 rgba(0,0,0,.70),
+    0 4px 14px rgba(0,0,0,.35),
+    0 0 28px rgba(240,86,106,.30);
+}
+.wave-dir-val.da-mare {
   color: #00d278;
   text-shadow:
     0 1px 0 rgba(255,255,255,.12),
@@ -836,7 +908,7 @@ header {
 .webcam-label {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
-  color: var(--text-3); text-transform: uppercase;
+  color: rgba(220,235,255,.62); text-transform: uppercase;
 }
 
 .live-badge {
@@ -972,6 +1044,8 @@ footer {
   </div>
 
   <div class="wave-card">
+    <div class="wave-card-label">Onde</div>
+    <div class="wave-card-inner">
     <div class="wave-svg">
       <svg viewBox="0 0 70 38" fill="none">
         <path stroke="#00d278" stroke-width="2" stroke-linecap="round" fill="none">
@@ -985,8 +1059,8 @@ footer {
     <div class="wave-info">
       <div class="wave-data-row">
         <div class="wave-data-col">
-          <div class="wave-height" id="waveHbig">-- CM</div>
-          <div class="wave-sub">ALTEZZA</div>
+          <div class="wave-height" id="waveHbig">-- cm</div>
+          <div class="wave-sub">ALT.</div>
         </div>
         <div class="wave-data-sep"></div>
         <div class="wave-data-col">
@@ -996,6 +1070,16 @@ footer {
           </div>
           <div class="wave-period-label">PERIODO</div>
         </div>
+        <div class="wave-data-sep"></div>
+        <div class="wave-data-col">
+          <div class="tide-histo" id="tideHisto">
+            <span class="th-bar" id="thBar1"></span>
+            <span class="th-bar" id="thBar2"></span>
+            <span class="th-bar" id="thBar3"></span>
+          </div>
+          <div class="wave-period-label">~MAREA</div>
+        </div>
+        <div class="wave-data-sep"></div>
       </div>
     </div>
     <!-- mini bussola direzione onde -->
@@ -1010,6 +1094,7 @@ footer {
     <div class="wave-dir-box">
       <div class="wave-dir-label">DIR. ONDE</div>
       <div class="wave-dir-val" id="waveDirVal">--</div>
+    </div>
     </div>
   </div>
 
@@ -1097,6 +1182,101 @@ function wmoInfo(c){
   return                        {icon:'🌡️', label:'N/D'};
 }
 
+/* ══════════════════════════════════════════════════════
+   MAREA — istogramma nel box Onde
+   Modello semidiurno con fase lunare + bathymetry
+   Torre Pedrera · stima qualitativa locale
+   ══════════════════════════════════════════════════════ */
+function loadTideEstimate(){
+  /* ── Parametri fisici locali ── */
+  const TIDE_PERIOD = 12.42;
+  const AMP_MIN     = 0.08;
+  const AMP_MAX     = 0.32;
+  const PHASE_SHIFT = 0.9;
+  const DEPTH       = 2.2;
+  const BATH_DAMP   = 0.92;
+  const OMEGA       = 2 * Math.PI / TIDE_PERIOD;
+
+  /* ── Fase lunare ── */
+  const LUNAR_EPOCH  = new Date('2000-01-06T18:14:00Z');
+  const LUNAR_PERIOD = 29.53058867;
+  const now          = new Date();
+  const lunarAge     = ((now - LUNAR_EPOCH) / 86400000 % LUNAR_PERIOD + LUNAR_PERIOD) % LUNAR_PERIOD;
+  const syzygyIdx    = 0.5 + 0.5 * Math.cos(4 * Math.PI * lunarAge / LUNAR_PERIOD);
+
+  /* ── Ampiezza + bathymetry ── */
+  const amplitude  = AMP_MIN + (AMP_MAX - AMP_MIN) * syzygyIdx;
+  const bathFactor = BATH_DAMP * Math.pow(DEPTH / 10, 0.25);
+  const A          = amplitude * bathFactor;
+
+  /* ── h(t) in cm ── */
+  function h(date){
+    return A * Math.sin(OMEGA * date.getTime() / 3600000 + PHASE_SHIFT) * 100;
+  }
+
+  /* ── Tendenza via derivata numerica ± 10 min ── */
+  const dh = h(new Date(now.getTime() + 10*60000)) - h(new Date(now.getTime() - 10*60000));
+  const rising  = dh >  0.4;
+  const falling = dh < -0.4;
+
+  /* ── Livello normalizzato 0..1 ── */
+  const hNow = h(now);
+  const norm = (hNow / (A * 100) + 1) / 2;
+
+  /* activeBars: quante barre accese (1=bassa, 2=media, 3=alta) */
+  const activeBars = norm < 0.33 ? 1 : norm < 0.67 ? 2 : 3;
+
+  /* ── Istogramma: ordine barre
+     CRESCENTE  → piccola→grande (sx=piccola, dx=grande)
+     CALANTE    → grande→piccola (sx=grande, dx=piccola)
+     STABILE    → piccola→grande (default crescente)
+  ── */
+  const histo = document.getElementById('tideHisto');
+  if (!histo) return;
+
+  const bars = [
+    document.getElementById('thBar1'),
+    document.getElementById('thBar2'),
+    document.getElementById('thBar3'),
+  ];
+  if (bars.some(b => !b)) return;
+
+  /* Ordine visivo: se calante inverti le altezze CSS */
+  if (falling) {
+    bars[0].style.height = '13px';
+    bars[1].style.height = '8px';
+    bars[2].style.height = '4px';
+  } else {
+    bars[0].style.height = '4px';
+    bars[1].style.height = '8px';
+    bars[2].style.height = '13px';
+  }
+
+  /* Assegna classi */
+  bars.forEach((b, i) => {
+    b.className = 'th-bar';
+    const pos = i + 1; // 1-indexed
+
+    if (falling) {
+      /* calante: barre ordinate grande→piccola
+         pos 1 = barra grande, pos 3 = barra piccola
+         accendiamo le prime activeBars */
+      if (pos < activeBars)        b.classList.add('on');
+      else if (pos === activeBars) b.classList.add('on-dim'); // top smorzata
+    } else {
+      /* crescente/stabile: piccola→grande
+         accendiamo le prime activeBars */
+      if (pos < activeBars)        b.classList.add('on');
+      else if (pos === activeBars) b.classList.add(rising ? 'on' : 'on');
+      /* hint sulla barra successiva se crescente */
+      if (rising && pos === activeBars + 1) b.classList.add('hint');
+    }
+  });
+}
+
+loadTideEstimate();
+setInterval(loadTideEstimate, 5*60*1000);
+
 /* ── LOADING STATE ─────────────────────────── */
 const LOADING_IDS = ['windAbbr','windDeg','windSpd','windFrom','windTo','waveHbig','wavePeriod','waveDirVal','wxIcon','wxTemp','wxCond'];
 function setLoading(on){
@@ -1139,6 +1319,7 @@ async function loadAll(){
       const wavePer=marine.current.wave_period!=null ? Math.round(marine.current.wave_period*10)/10 : '--';
       document.getElementById('waveHbig').textContent=wcm+' cm';
       document.getElementById('waveDirVal').textContent=degToCompass(waveDir);
+      document.getElementById('waveDirVal').className='wave-dir-val '+windClass(waveDir);
       document.getElementById('waveNeedle').style.transform=`rotate(${waveDir}deg)`;
       document.getElementById('wavePeriod').textContent=wavePer;
     }
