@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -9,548 +8,102 @@
 <title>SUP · Torre Pedrera</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-:root {
-  --deep: #060e1c;
-  --border: rgba(255,255,255,0.08);
-  --accent: #00d4ff;
-  --warn: #ff4757;
-  --coral: #ff6b81;
-  --text: #e8f4ff;
-  --muted: rgba(232,244,255,0.4);
-  --mono: 'DM Mono', monospace;
-  --display: 'Bebas Neue', sans-serif;
-}
+:root{--deep:#060e1c;--border:rgba(255,255,255,0.08);--accent:#00d4ff;--warn:#ff4757;--text:#e8f4ff;--muted:rgba(232,244,255,0.4);--mono:'DM Mono',monospace;--display:'Bebas Neue',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(0,133,255,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 80% 20%,rgba(0,212,255,.08),transparent 50%)}
+#app{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:env(safe-area-inset-top,20px) 0 44px}
 
-- { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-  background: var(–deep);
-  color: var(–text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  }
+/* HEADER */
+header{padding:20px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between}
+.logo h1{font-family:var(--display);font-size:52px;letter-spacing:3px;line-height:1;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo .sub{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:2px}
+.header-right{text-align:right}
+.time-display{font-family:var(--display);font-size:42px;letter-spacing:2px;line-height:1}
+.date-display{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
 
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-z-index: 0;
-background:
-radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0,133,255,.12), transparent 60%),
-radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,212,255,.08), transparent 50%);
-pointer-events: none;
-}
+/* STATUS */
+.status-bar{margin:8px 24px 20px;padding:10px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:50px;display:flex;align-items:center;gap:10px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#00ff88;flex-shrink:0;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.status-text{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;flex:1}
+.status-refresh{width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.05);color:var(--muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.status-refresh:active{background:rgba(255,255,255,.12);color:#fff}
+.spin{animation:rotateSpin .7s linear}
+@keyframes rotateSpin{to{transform:rotate(360deg)}}
 
-#app {
-position: relative;
-z-index: 1;
-max-width: 430px;
-margin: 0 auto;
-padding: env(safe-area-inset-top, 20px) 0 44px;
-}
+/* wind-spd widget — stesso stile di wx-widget */
+.spd-widget{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:11px 10px 9px;background:rgba(255,107,129,.04);border:1px solid rgba(255,107,129,.18);border-radius:16px;min-width:65px}
+.spd-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 5px rgba(255,107,129,.3))}
+.spd-val{font-family:var(--display);font-size:26px;letter-spacing:1px;line-height:1}
+.spd-unit{font-family:var(--mono);font-size:6.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:center}
 
-/* ── HEADER ─────────────────────────────────────────── */
-header {
-padding: 20px 24px 12px;
-display: flex;
-align-items: flex-start;
-justify-content: space-between;
-}
+/* WIND CARD */
+.wind-card{margin:0 24px 16px;background:rgba(10,25,50,.65);border:1px solid var(--border);border-radius:20px;padding:20px}
+.card-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
 
-.logo h1 {
-font-family: var(–display);
-font-size: 58px;
-letter-spacing: 3px;
-line-height: 1;
-background: linear-gradient(135deg, #fff, var(–accent));
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-}
+/* 3 colonne: compass | dir | wx */
+.wind-main{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 
-.logo .sub {
-font-family: var(–mono);
-font-size: 9px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-top: 3px;
-}
+/* COMPASS */
+.compass{flex-shrink:0;width:94px;height:94px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);position:relative}
+.c-n{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
+.c-needle{position:absolute;top:50%;left:50%;width:2px;height:46px;margin-left:-1px;margin-top:-38px;transform-origin:bottom center;transition:transform 1s cubic-bezier(.4,0,.2,1)}
+.c-tip{height:30px;background:linear-gradient(to bottom,#ff6b81,rgba(255,107,129,.25));border-radius:2px 2px 0 0}
+.c-tail{height:16px;background:rgba(255,255,255,.15);border-radius:0 0 2px 2px}
+.c-dot{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}
 
-.header-right { text-align: right; }
+/* DIR TEXT */
+.wind-dir-info{flex:1;min-width:0}
+.wind-abbr{font-family:var(--display);font-size:52px;letter-spacing:2px;line-height:1}
+.wind-abbr.da-terra{color:#ff6b81}
+.wind-abbr.da-mare{color:var(--accent)}
+.wind-deg{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-top:5px}
 
-.time-display {
-font-family: var(–display);
-font-size: 38px;
-letter-spacing: 2px;
-line-height: 1;
-}
+/* ★ WEATHER WIDGET — invariato nel token styling, pura aggiunta */
+.wx-widget{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:11px 10px 9px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14);border-radius:16px;min-width:65px}
+.wx-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 5px rgba(0,212,255,.3))}
+.wx-temp{font-family:var(--display);font-size:26px;letter-spacing:1px;line-height:1}
+.wx-cond{font-family:var(--mono);font-size:6.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:center;line-height:1.6;white-space:pre-line}
 
-.date-display {
-font-family: var(–mono);
-font-size: 9px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-top: 4px;
-}
+/* FORECAST */
+.forecast-sep{height:1px;background:rgba(255,255,255,.06);margin-bottom:16px}
+.forecast-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.forecast-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.forecast-scroll::-webkit-scrollbar{display:none}
+.forecast-row{display:flex;gap:8px;padding-bottom:2px}
+.fi{flex-shrink:0;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px 10px;text-align:center;min-width:56px}
+.fi-time{font-family:var(--mono);font-size:7px;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.fi-dir{font-family:var(--display);font-size:20px;letter-spacing:1px;line-height:1}
+.fi-dir.da-terra{color:#ff6b81}
+.fi-dir.da-mare{color:var(--accent)}
+.fi-deg{font-family:var(--mono);font-size:7px;letter-spacing:1px;color:rgba(232,244,255,.22);margin-top:3px}
 
-/* ── STATUS BAR ─────────────────────────────────────── */
-.status-bar {
-margin: 8px 24px 20px;
-padding: 10px 14px;
-background: rgba(255,255,255,.03);
-border: 1px solid var(–border);
-border-radius: 50px;
-display: flex;
-align-items: center;
-}
+/* WAVE CARD */
+.wave-card{margin:0 24px 16px;background:rgba(10,25,50,.65);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;align-items:center;gap:14px}
+.wave-svg svg{width:68px;height:38px;display:block}
+.wave-info{flex:1}
+.wave-height{font-family:var(--display);font-size:42px;letter-spacing:2px;line-height:1}
+.wave-sub{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+.wave-dir-box{text-align:right}
+.wave-dir-label{font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.wave-dir-val{font-family:var(--display);font-size:38px;letter-spacing:2px;line-height:1}
 
-.status-dot {
-width: 7px; height: 7px;
-border-radius: 50%;
-background: #00ff88;
-flex-shrink: 0;
-animation: blink 2s infinite;
-}
+/* WEBCAM — stessa struttura .vbox del test-stream originale */
+.webcam-section{margin:0 24px 8px}
+.webcam-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.webcam-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.live-badge{display:flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.28);border-radius:20px;font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--warn);text-transform:uppercase}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--warn);animation:blink 1.4s infinite}
+.vbox{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--border);background:#000;aspect-ratio:16/9}
+.vbox iframe{width:100%;height:100%;border:none;display:block}
+.vlabel{position:absolute;top:10px;left:10px;z-index:3;font-family:var(--mono);font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.65);background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:4px 10px;border-radius:20px;text-transform:uppercase;pointer-events:none}
 
-@keyframes blink {
-0%,100% { opacity: 1; }
-50%      { opacity: .35; }
-}
-
-.status-text {
-font-family: var(–mono);
-font-size: 9px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-left: 10px;
-flex: 1;
-}
-
-.status-refresh {
-width: 28px; height: 28px;
-border-radius: 50%;
-border: none;
-background: rgba(255,255,255,.05);
-color: var(–muted);
-cursor: pointer;
-font-size: 14px;
-display: flex; align-items: center; justify-content: center;
-transition: background .2s, color .2s;
-}
-.status-refresh:active { background: rgba(255,255,255,.12); color: #fff; }
-.status-refresh.spin { animation: rotateSpin .7s linear; }
-@keyframes rotateSpin { to { transform: rotate(360deg); } }
-
-/* ── METRIC CARDS ───────────────────────────────────── */
-.metrics-row {
-margin: 0 24px 16px;
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 12px;
-}
-
-.metric-card {
-background: rgba(10,25,50,.65);
-border: 1px solid var(–border);
-border-radius: 20px;
-padding: 16px;
-position: relative;
-overflow: hidden;
-}
-
-.metric-label {
-font-family: var(–mono);
-font-size: 8px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-display: flex;
-align-items: center;
-gap: 5px;
-margin-bottom: 10px;
-}
-
-.metric-trend {
-position: absolute;
-top: 14px; right: 14px;
-font-size: 16px;
-}
-.trend-up   { color: var(–coral); }
-.trend-flat { color: var(–muted); }
-
-.metric-value {
-font-family: var(–display);
-font-size: 52px;
-letter-spacing: 1px;
-line-height: 1;
-}
-
-.metric-unit {
-font-family: var(–mono);
-font-size: 9px;
-letter-spacing: 2px;
-color: var(–muted);
-margin-top: 6px;
-}
-
-.metric-bar {
-margin-top: 14px;
-height: 2px;
-background: rgba(255,255,255,.05);
-border-radius: 2px;
-overflow: hidden;
-}
-.metric-bar-fill {
-height: 100%;
-border-radius: 2px;
-background: linear-gradient(90deg, var(–accent), rgba(0,212,255,.35));
-transition: width 1.2s cubic-bezier(.4,0,.2,1);
-}
-
-/* ── WIND CARD ──────────────────────────────────────── */
-.wind-card {
-margin: 0 24px 16px;
-background: rgba(10,25,50,.65);
-border: 1px solid var(–border);
-border-radius: 20px;
-padding: 20px;
-}
-
-.card-label {
-font-family: var(–mono);
-font-size: 8px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-bottom: 16px;
-}
-
-/* three-column row: compass | dir-text | weather */
-.wind-main {
-display: flex;
-align-items: center;
-gap: 14px;
-margin-bottom: 20px;
-}
-
-/* Compass */
-.compass {
-flex-shrink: 0;
-width: 96px; height: 96px;
-border-radius: 50%;
-border: 1px solid rgba(255,255,255,.12);
-background: rgba(0,0,0,.3);
-position: relative;
-}
-
-.c-n {
-position: absolute;
-top: 6px; left: 50%;
-transform: translateX(-50%);
-font-family: var(–mono);
-font-size: 9px;
-color: var(–muted);
-letter-spacing: 1px;
-}
-
-.c-needle {
-position: absolute;
-top: 50%; left: 50%;
-width: 2px; height: 46px;
-margin-left: -1px;
-margin-top: -38px;
-transform-origin: bottom center;
-transition: transform 1s cubic-bezier(.4,0,.2,1);
-}
-.c-tip  { height: 30px; background: linear-gradient(to bottom, var(–coral), rgba(255,107,129,.25)); border-radius: 2px 2px 0 0; }
-.c-tail { height: 16px; background: rgba(255,255,255,.15); border-radius: 0 0 2px 2px; }
-
-.c-dot {
-position: absolute;
-top: 50%; left: 50%;
-width: 6px; height: 6px;
-border-radius: 50%;
-background: #fff;
-transform: translate(-50%,-50%);
-}
-
-/* Direction label */
-.wind-dir-info { flex: 1; min-width: 0; }
-
-.wind-abbr {
-font-family: var(–display);
-font-size: 52px;
-letter-spacing: 2px;
-line-height: 1;
-color: var(–coral);
-}
-
-.wind-deg {
-font-family: var(–mono);
-font-size: 11px;
-letter-spacing: 2px;
-color: var(–muted);
-margin-top: 5px;
-}
-
-/* ── WEATHER WIDGET (NEW) ───────────────────────────── */
-.wx-widget {
-flex-shrink: 0;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 5px;
-padding: 12px 12px 10px;
-background: rgba(0,212,255,.035);
-border: 1px solid rgba(0,212,255,.12);
-border-radius: 16px;
-min-width: 68px;
-position: relative;
-overflow: hidden;
-}
-
-.wx-widget::before {
-content: ‘’;
-position: absolute;
-top: -20px; right: -20px;
-width: 60px; height: 60px;
-border-radius: 50%;
-background: rgba(0,212,255,.05);
-pointer-events: none;
-}
-
-.wx-icon {
-font-size: 26px;
-line-height: 1;
-filter: drop-shadow(0 0 6px rgba(0,212,255,.3));
-}
-
-.wx-temp {
-font-family: var(–display);
-font-size: 24px;
-letter-spacing: 1px;
-color: #fff;
-line-height: 1;
-}
-
-.wx-cond {
-font-family: var(–mono);
-font-size: 6.5px;
-letter-spacing: 1.5px;
-color: var(–muted);
-text-transform: uppercase;
-text-align: center;
-line-height: 1.5;
-white-space: pre-line;
-}
-
-/* ── FORECAST ───────────────────────────────────────── */
-.forecast-sep {
-height: 1px;
-background: rgba(255,255,255,.06);
-margin-bottom: 16px;
-}
-
-.forecast-label {
-font-family: var(–mono);
-font-size: 8px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-bottom: 10px;
-}
-
-.forecast-scroll {
-overflow-x: auto;
--webkit-overflow-scrolling: touch;
-scrollbar-width: none;
-}
-.forecast-scroll::-webkit-scrollbar { display: none; }
-
-.forecast-row {
-display: flex;
-gap: 8px;
-padding-bottom: 2px;
-}
-
-.fi {
-flex-shrink: 0;
-background: rgba(0,0,0,.3);
-border: 1px solid rgba(255,255,255,.06);
-border-radius: 12px;
-padding: 8px 10px;
-text-align: center;
-min-width: 60px;
-}
-
-.fi-time {
-font-family: var(–mono);
-font-size: 7px;
-letter-spacing: 1px;
-color: var(–muted);
-margin-bottom: 5px;
-}
-
-.fi-dir {
-font-family: var(–display);
-font-size: 21px;
-letter-spacing: 1px;
-color: var(–coral);
-line-height: 1;
-}
-.fi-dir.calm { color: var(–accent); }
-
-.fi-deg {
-font-family: var(–mono);
-font-size: 7px;
-letter-spacing: 1px;
-color: rgba(232,244,255,.22);
-margin-top: 3px;
-}
-
-/* ── WAVE CARD ──────────────────────────────────────── */
-.wave-card {
-margin: 0 24px 16px;
-background: rgba(10,25,50,.65);
-border: 1px solid var(–border);
-border-radius: 20px;
-padding: 20px;
-display: flex;
-align-items: center;
-gap: 14px;
-}
-
-.wave-svg { flex-shrink: 0; }
-.wave-svg svg { width: 68px; height: 38px; display: block; }
-
-.wave-info { flex: 1; }
-
-.wave-height {
-font-family: var(–display);
-font-size: 42px;
-letter-spacing: 2px;
-line-height: 1;
-}
-
-.wave-sub {
-font-family: var(–mono);
-font-size: 8px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-top: 4px;
-}
-
-.wave-dir-box { text-align: right; }
-
-.wave-dir-label {
-font-family: var(–mono);
-font-size: 7px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-margin-bottom: 3px;
-}
-
-.wave-dir-val {
-font-family: var(–display);
-font-size: 38px;
-letter-spacing: 2px;
-line-height: 1;
-}
-
-/* ── WEBCAM ─────────────────────────────────────────── */
-.webcam-section { margin: 0 24px 16px; }
-
-.webcam-header {
-display: flex;
-align-items: center;
-gap: 12px;
-margin-bottom: 12px;
-}
-
-.webcam-label {
-font-family: var(–mono);
-font-size: 8px;
-letter-spacing: 3px;
-color: var(–muted);
-text-transform: uppercase;
-}
-
-.live-badge {
-display: flex;
-align-items: center;
-gap: 5px;
-padding: 3px 10px;
-background: rgba(255,71,87,.12);
-border: 1px solid rgba(255,71,87,.28);
-border-radius: 20px;
-font-family: var(–mono);
-font-size: 7px;
-letter-spacing: 2px;
-color: var(–warn);
-text-transform: uppercase;
-}
-
-.live-dot {
-width: 5px; height: 5px;
-border-radius: 50%;
-background: var(–warn);
-animation: blink 1.4s infinite;
-}
-
-.webcam-box {
-position: relative;
-border-radius: 18px;
-overflow: hidden;
-border: 1px solid var(–border);
-background: #000;
-aspect-ratio: 16/9;
-}
-
-.webcam-box iframe {
-width: 100%; height: 100%;
-border: none;
-display: block;
-}
-
-.webcam-loc {
-position: absolute;
-top: 10px; left: 10px;
-z-index: 3;
-font-family: var(–mono);
-font-size: 7px;
-letter-spacing: 2px;
-color: rgba(255,255,255,.7);
-background: rgba(0,0,0,.55);
-backdrop-filter: blur(8px);
--webkit-backdrop-filter: blur(8px);
-padding: 4px 10px;
-border-radius: 20px;
-text-transform: uppercase;
-pointer-events: none;
-}
-
-/* ── FOOTER ─────────────────────────────────────────── */
-footer {
-text-align: center;
-padding: 16px 24px 0;
-font-family: var(–mono);
-font-size: 7px;
-letter-spacing: 3px;
-color: rgba(255,255,255,.1);
-text-transform: uppercase;
-}
+footer{text-align:center;padding:16px 24px 0;font-family:var(--mono);font-size:7px;letter-spacing:3px;color:rgba(255,255,255,.1);text-transform:uppercase}
 </style>
-
 </head>
 <body>
 <div id="app">
-
-  <!-- HEADER -->
 
   <header>
     <div class="logo">
@@ -563,77 +116,51 @@ text-transform: uppercase;
     </div>
   </header>
 
-  <!-- STATUS -->
-
   <div class="status-bar">
     <div class="status-dot"></div>
     <div class="status-text" id="statusText">CARICAMENTO…</div>
-    <button class="status-refresh" id="refreshBtn" onclick="loadAll()" aria-label="Aggiorna">↻</button>
+    <button class="status-refresh" id="refreshBtn" onclick="refresh()" aria-label="Aggiorna">↻</button>
   </div>
-
-  <!-- METRICS -->
-
-  <div class="metrics-row">
-    <div class="metric-card">
-      <div class="metric-label">〜 ONDE</div>
-      <div class="metric-trend trend-flat" id="waveTrend">—</div>
-      <div class="metric-value" id="waveVal">--</div>
-      <div class="metric-unit">centimetri</div>
-      <div class="metric-bar"><div class="metric-bar-fill" id="waveBar" style="width:5%"></div></div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">≋ VENTO</div>
-      <div class="metric-trend trend-up" id="windTrend">▲</div>
-      <div class="metric-value" id="windSpd">--</div>
-      <div class="metric-unit">km/h</div>
-      <div class="metric-bar"><div class="metric-bar-fill" id="windBar" style="width:5%"></div></div>
-    </div>
-  </div>
-
-  <!-- WIND DIRECTION CARD -->
 
   <div class="wind-card">
     <div class="card-label">DIREZIONE VENTO</div>
+    <div class="wind-main">
 
-```
-<div class="wind-main">
-  <!-- Compass rose -->
-  <div class="compass">
-    <div class="c-n">N</div>
-    <div class="c-needle" id="needle">
-      <div class="c-tip"></div>
-      <div class="c-tail"></div>
+      <div class="compass">
+        <div class="c-n">N</div>
+        <div class="c-needle" id="needle">
+          <div class="c-tip"></div>
+          <div class="c-tail"></div>
+        </div>
+        <div class="c-dot"></div>
+      </div>
+
+      <div class="wind-dir-info">
+        <div class="wind-abbr da-terra" id="windAbbr">---</div>
+        <div class="wind-deg" id="windDeg">--- °</div>
+      </div>
+
+      <!-- wind speed widget — prima del meteo -->
+      <div class="spd-widget">
+        <div class="spd-icon">💨</div>
+        <div class="spd-val" id="windSpd">--</div>
+        <div class="spd-unit">km/h</div>
+      </div>
+
+      <!-- ★ WEATHER WIDGET (solo aggiunta, tutto il resto invariato) -->
+      <div class="wx-widget">
+        <div class="wx-icon" id="wxIcon">⋯</div>
+        <div class="wx-temp" id="wxTemp">--°</div>
+        <div class="wx-cond" id="wxCond">---</div>
+      </div>
+
     </div>
-    <div class="c-dot"></div>
+    <div class="forecast-sep"></div>
+    <div class="forecast-label">EVOLUZIONE PROSSIME ORE</div>
+    <div class="forecast-scroll">
+      <div class="forecast-row" id="forecastRow"></div>
+    </div>
   </div>
-
-  <!-- Dir label -->
-  <div class="wind-dir-info">
-    <div class="wind-abbr" id="windAbbr">---</div>
-    <div class="wind-deg" id="windDeg">--- °</div>
-  </div>
-
-  <!-- ── WEATHER WIDGET (NEW) ── -->
-  <div class="wx-widget">
-    <div class="wx-icon" id="wxIcon">⋯</div>
-    <div class="wx-temp" id="wxTemp">--°</div>
-    <div class="wx-cond" id="wxCond">---</div>
-  </div>
-</div>
-
-<!-- Forecast -->
-<div class="forecast-sep"></div>
-<div class="forecast-label">EVOLUZIONE PROSSIME ORE</div>
-<div class="forecast-scroll">
-  <div class="forecast-row" id="forecastRow">
-    <!-- populated by JS -->
-  </div>
-</div>
-```
-
-  </div>
-
-  <!-- WAVE CARD -->
 
   <div class="wave-card">
     <div class="wave-svg">
@@ -656,22 +183,21 @@ text-transform: uppercase;
     </div>
   </div>
 
-  <!-- WEBCAM — strategy 01: YouTube NoCookie (only embed that works reliably) -->
-
+  <!-- WEBCAM: solo strategia 01 YouTube NoCookie — attributi identici all'originale -->
   <div class="webcam-section">
     <div class="webcam-header">
       <div class="webcam-label">WEBCAM LIVE</div>
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
     </div>
-    <div class="webcam-box">
+    <div class="vbox">
       <iframe
         src="https://www.youtube-nocookie.com/embed/1A2PUj7SS5o?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3"
-        allow="autoplay; encrypted-media; picture-in-picture"
+        allow="autoplay;encrypted-media;picture-in-picture"
         allowfullscreen
         playsinline
         referrerpolicy="no-referrer">
       </iframe>
-      <div class="webcam-loc">TORRE PEDRERA</div>
+      <div class="vlabel">TORRE PEDRERA</div>
     </div>
   </div>
 
@@ -679,138 +205,109 @@ text-transform: uppercase;
 </div>
 
 <script>
-// ── CONSTANTS ────────────────────────────────────────────────────────────────
-// Coordinates: Torre Pedrera, Rimini, Italy
-const LAT = 44.07;
-const LON = 12.62;
+/* ── CONFIG ─────────────────────────────── */
+const LAT = 44.07, LON = 12.62;  // Torre Pedrera, Rimini
 
-// ── CLOCK ────────────────────────────────────────────────────────────────────
+/* ── OROLOGIO ───────────────────────────── */
 const DAYS   = ['DOM','LUN','MAR','MER','GIO','VEN','SAB'];
 const MONTHS = ['GEN','FEB','MAR','APR','MAG','GIU','LUG','AGO','SET','OTT','NOV','DIC'];
-
-function tickClock() {
-  const n = new Date();
-  const hh = String(n.getHours()).padStart(2,'0');
-  const mm = String(n.getMinutes()).padStart(2,'0');
-  document.getElementById('clock').textContent = `${hh}:${mm}`;
-  document.getElementById('dateDisp').textContent =
-    `${DAYS[n.getDay()]} ${n.getDate()} ${MONTHS[n.getMonth()]}`;
+function tickClock(){
+  const n=new Date(), hh=String(n.getHours()).padStart(2,'0'), mm=String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent=`${hh}:${mm}`;
+  document.getElementById('dateDisp').textContent=`${DAYS[n.getDay()]} ${n.getDate()} ${MONTHS[n.getMonth()]}`;
 }
-tickClock();
-setInterval(tickClock, 1000);
+tickClock(); setInterval(tickClock,1000);
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
-function degToCompass(deg) {
-  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE',
-                'S','SSO','SO','OSO','O','ONO','NO','NNO'];
-  return dirs[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16];
+/* ── HELPERS ────────────────────────────── */
+function degToCompass(d){
+  const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  return dirs[Math.round(((d%360)+360)%360/22.5)%16];
 }
 
-function wmoInfo(code) {
-  if (code === 0)        return { icon: '☀️',  label: 'SOLEGGIATO' };
-  if (code <= 1)        return { icon: '🌤️',  label: 'POCO\nNUVOLOSO' };
-  if (code <= 2)        return { icon: '⛅',  label: 'PARZ.\nNUVOLOSO' };
-  if (code === 3)        return { icon: '☁️',  label: 'COPERTO' };
-  if (code <= 48)        return { icon: '🌫️', label: 'NEBBIA' };
-  if (code <= 57)        return { icon: '🌦️', label: 'PIOVIGGINE' };
-  if (code <= 67)        return { icon: '🌧️', label: 'PIOGGIA' };
-  if (code <= 77)        return { icon: '🌨️', label: 'NEVE' };
-  if (code <= 82)        return { icon: '🌦️', label: 'ROVESCI' };
-  return                        { icon: '⛈️', label: 'TEMPORALE' };
+// Torre Pedrera: costa EST sull'Adriatico. 
+// Da mare (buono) = vento da E quadrant: 30°–160°  → .da-mare (ciano)
+// Da terra        = tutto il resto        → .da-terra (corallo/rosso)
+function windClass(deg){
+  const d=((deg%360)+360)%360;
+  return (d>=30&&d<=160)?'da-mare':'da-terra';
 }
 
-// ── MAIN LOAD ────────────────────────────────────────────────────────────────
-async function loadAll() {
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spin');
-  document.getElementById('statusText').textContent = 'AGGIORNAMENTO…';
+function wmoInfo(c){
+  if(c===0)  return{icon:'☀️',label:'SOLEGGIATO'};
+  if(c<=1)   return{icon:'🌤️',label:'POCO\nNUVOLOSO'};
+  if(c<=2)   return{icon:'⛅',label:'PARZ.\nNUVOLOSO'};
+  if(c===3)  return{icon:'☁️',label:'COPERTO'};
+  if(c<=48)  return{icon:'🌫️',label:'NEBBIA'};
+  if(c<=57)  return{icon:'🌦️',label:'PIOVIGGINE'};
+  if(c<=67)  return{icon:'🌧️',label:'PIOGGIA'};
+  if(c<=77)  return{icon:'🌨️',label:'NEVE'};
+  if(c<=82)  return{icon:'🌦️',label:'ROVESCI'};
+  return          {icon:'⛈️',label:'TEMPORALE'};
+}
 
-  try {
-    const [marineRes, windRes, wxRes] = await Promise.all([
-      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction&wind_speed_unit=kmh&timezone=Europe/Rome`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
+/* ── LOAD ───────────────────────────────── */
+async function loadAll(){
+  try{
+    const [mRes,wRes,xRes]=await Promise.all([
+      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction&timezone=Europe/Rome`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&timezone=Europe/Rome`)
     ]);
+    const [marine,wind,wx]=await Promise.all([mRes.json(),wRes.json(),xRes.json()]);
 
-    const [marine, wind, wx] = await Promise.all([
-      marineRes.json(), windRes.json(), wxRes.json()
-    ]);
+    /* vento */
+    const wDeg=Math.round(wind.current.winddirection_10m);
+    const wSpd=Math.round(wind.current.windspeed_10m);
+    document.getElementById('windSpd').textContent=wSpd;
+    document.getElementById('windAbbr').textContent=degToCompass(wDeg);
+    document.getElementById('windAbbr').className='wind-abbr '+windClass(wDeg);
+    document.getElementById('windDeg').textContent=`${wDeg} °`;
+    document.getElementById('needle').style.transform=`rotate(${wDeg}deg)`;
 
-    // ── Wind ──
-    const wDeg  = Math.round(wind.current.winddirection_10m);
-    const wSpd  = Math.round(wind.current.windspeed_10m);
-    const wAbbr = degToCompass(wDeg);
-
-    document.getElementById('windAbbr').textContent = wAbbr;
-    document.getElementById('windDeg').textContent  = `${wDeg} °`;
-    document.getElementById('windSpd').textContent  = wSpd;
-    document.getElementById('windBar').style.width  = Math.min(wSpd / 60 * 100, 100) + '%';
-    document.getElementById('needle').style.transform = `rotate(${wDeg}deg)`;
-
-    const trendEl = document.getElementById('windTrend');
-    trendEl.textContent = wSpd > 8 ? '▲' : '—';
-    trendEl.className   = wSpd > 8 ? 'metric-trend trend-up' : 'metric-trend trend-flat';
-
-    // ── Waves ──
-    if (marine && marine.current) {
-      const wh  = marine.current.wave_height;
-      const wcm = Math.round(wh * 100);
-      const wd  = marine.current.wave_direction;
-      document.getElementById('waveVal').textContent    = wcm;
-      document.getElementById('waveHbig').textContent   = `${wcm} CM`;
-      document.getElementById('waveDirVal').textContent = degToCompass(wd);
-      document.getElementById('waveBar').style.width    = Math.min(wcm / 150 * 100, 100) + '%';
+    /* onde */
+    if(marine?.current){
+      const wcm=Math.round(marine.current.wave_height*100);
+      document.getElementById('waveHbig').textContent=wcm+' CM';
+      document.getElementById('waveDirVal').textContent=degToCompass(marine.current.wave_direction);
     }
 
-    // ── Weather widget ──
-    const temp = Math.round(wx.current.temperature_2m);
-    const { icon, label } = wmoInfo(wx.current.weathercode);
-    document.getElementById('wxIcon').textContent = icon;
-    document.getElementById('wxTemp').textContent = `${temp}°`;
-    document.getElementById('wxCond').textContent = label;
+    /* meteo */
+    const{icon,label}=wmoInfo(wx.current.weathercode);
+    document.getElementById('wxIcon').textContent=icon;
+    document.getElementById('wxTemp').textContent=Math.round(wx.current.temperature_2m)+'°';
+    document.getElementById('wxCond').textContent=label;
 
-    // ── Hourly forecast ──
-    const now    = new Date();
-    const times  = wind.hourly.time;
-    const wdirs  = wind.hourly.winddirection_10m;
-    const row    = document.getElementById('forecastRow');
-    row.innerHTML = '';
-    let count = 0;
-
-    for (let i = 0; i < times.length && count < 8; i++) {
-      const t = new Date(times[i]);
-      if (t > now) {
-        const abbr  = degToCompass(wdirs[i]);
-        const isN   = wdirs[i] < 15 || wdirs[i] > 345;
-        const item  = document.createElement('div');
-        item.className = 'fi';
-        item.innerHTML = `
-          <div class="fi-time">${String(t.getHours()).padStart(2,'0')}:00</div>
-          <div class="fi-dir${isN ? ' calm' : ''}">${abbr}</div>
-          <div class="fi-deg">${Math.round(wdirs[i])}°</div>
-        `;
-        row.appendChild(item);
-        count++;
+    /* forecast */
+    const now=new Date(), times=wind.hourly.time, wdirs=wind.hourly.winddirection_10m;
+    const row=document.getElementById('forecastRow');
+    row.innerHTML=''; let cnt=0;
+    for(let i=0;i<times.length&&cnt<8;i++){
+      const t=new Date(times[i]);
+      if(t>now){
+        const el=document.createElement('div');
+        el.className='fi';
+        el.innerHTML=`<div class="fi-time">${String(t.getHours()).padStart(2,'0')}:00</div><div class="fi-dir ${windClass(wdirs[i])}">${degToCompass(wdirs[i])}</div><div class="fi-deg">${Math.round(wdirs[i])}°</div>`;
+        row.appendChild(el); cnt++;
       }
     }
 
-    // ── Status ──
-    const n   = new Date();
-    const hh2 = String(n.getHours()).padStart(2,'0');
-    const mm2 = String(n.getMinutes()).padStart(2,'0');
-    document.getElementById('statusText').textContent = `AGGIORNATO · ${hh2}:${mm2}`;
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('statusText').textContent = 'ERRORE CONNESSIONE';
+    /* status */
+    const n=new Date();
+    document.getElementById('statusText').textContent=`AGGIORNATO · ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  }catch(e){
+    console.error(e);
+    document.getElementById('statusText').textContent='ERRORE CONNESSIONE';
   }
+}
 
-  btn.classList.remove('spin');
+function refresh(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spin');
+  loadAll().finally(()=>btn.classList.remove('spin'));
 }
 
 loadAll();
-setInterval(loadAll, 5 * 60 * 1000); // auto-refresh ogni 5 min
+setInterval(loadAll,5*60*1000);
 </script>
-
 </body>
 </html>
