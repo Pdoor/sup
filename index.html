@@ -8,98 +8,567 @@
 <title>SUP · Torre Pedrera</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-:root{--deep:#060e1c;--border:rgba(255,255,255,0.08);--accent:#00d4ff;--warn:#ff4757;--text:#e8f4ff;--muted:rgba(232,244,255,0.4);--mono:'DM Mono',monospace;--display:'Bebas Neue',sans-serif}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 20% 80%,rgba(0,133,255,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 80% 20%,rgba(0,212,255,.08),transparent 50%)}
-#app{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:env(safe-area-inset-top,20px) 0 44px}
+/* ═══════════════════════════════════════════════════════
+   DESIGN SYSTEM — SUP PREMIUM
+   Palette:  #070912 base · #0d1526 surface · #131e30 card
+   Accent:   #00c8f0 (ciano adriatico)
+   Signal:   #f0566a (vento da terra)
+   Chrome:   rgba(255,255,255,.055) border
+   ═══════════════════════════════════════════════════════ */
 
-/* HEADER */
-header{padding:20px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between}
-.logo h1{font-family:var(--display);font-size:52px;letter-spacing:3px;line-height:1;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo .sub{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.header-right{text-align:right}
-.time-display{font-family:var(--display);font-size:42px;letter-spacing:2px;line-height:1}
-.date-display{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+:root {
+  --bg:        #070912;
+  --surface:   #0c1422;
+  --card:      rgba(14,22,40,.72);
+  --card-hi:   rgba(18,28,50,.80);
+  --border:    rgba(255,255,255,.055);
+  --border-hi: rgba(255,255,255,.10);
+  --accent:    #00c8f0;
+  --accent-dim:rgba(0,200,240,.12);
+  --accent-glow:rgba(0,200,240,.22);
+  --warn:      #f0566a;
+  --warn-dim:  rgba(240,86,106,.10);
+  --warn-glow: rgba(240,86,106,.20);
+  --text:      #e6f0ff;
+  --text-2:    rgba(220,235,255,.55);
+  --text-3:    rgba(220,235,255,.28);
+  --mono:      'DM Mono', monospace;
+  --disp:      'Bebas Neue', sans-serif;
+  --r-card:    22px;
+  --r-pill:    100px;
+  --r-widget:  16px;
+  --r-chip:    10px;
+}
 
-/* STATUS */
-.status-bar{margin:8px 24px 20px;padding:10px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:50px;display:flex;align-items:center;gap:10px}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#00ff88;flex-shrink:0;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-.status-text{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;flex:1}
-.status-refresh{width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.05);color:var(--muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.2s}
-.status-refresh:active{background:rgba(255,255,255,.12);color:#fff}
-.spin{animation:rotateSpin .7s linear}
-@keyframes rotateSpin{to{transform:rotate(360deg)}}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-/* wind-spd widget — stesso stile di wx-widget */
-.spd-widget{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:11px 10px 9px;background:rgba(255,107,129,.04);border:1px solid rgba(255,107,129,.18);border-radius:16px;min-width:65px}
-.spd-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 5px rgba(255,107,129,.3))}
-.spd-val{font-family:var(--display);font-size:26px;letter-spacing:1px;line-height:1}
-.spd-unit{font-family:var(--mono);font-size:6.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:center}
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* WIND CARD */
-.wind-card{margin:0 24px 16px;background:rgba(10,25,50,.65);border:1px solid var(--border);border-radius:20px;padding:20px}
-.card-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+/* ── Ambient light layers ───────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 85%, rgba(0,120,255,.09), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 85% 10%, rgba(0,200,240,.07), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(0,80,180,.04), transparent 60%);
+}
 
-/* 3 colonne: compass | dir | wx */
-.wind-main{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+/* ── App shell ──────────────────────────────────────── */
+#app {
+  position: relative; z-index: 1;
+  max-width: 430px; margin: 0 auto;
+  padding: env(safe-area-inset-top, 24px) 0 52px;
+}
 
-/* COMPASS */
-.compass{flex-shrink:0;width:94px;height:94px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);position:relative}
-.c-n{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
-.c-needle{position:absolute;top:50%;left:50%;width:2px;height:46px;margin-left:-1px;margin-top:-38px;transform-origin:bottom center;transition:transform 1s cubic-bezier(.4,0,.2,1)}
-.c-tip{height:30px;background:linear-gradient(to bottom,#ff6b81,rgba(255,107,129,.25));border-radius:2px 2px 0 0}
-.c-tail{height:16px;background:rgba(255,255,255,.15);border-radius:0 0 2px 2px}
-.c-dot{position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}
+/* ── Staggered entry animation ──────────────────────── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+header        { animation: rise .55s cubic-bezier(.22,1,.36,1) both; }
+.status-bar   { animation: rise .55s cubic-bezier(.22,1,.36,1) .08s both; }
+.wind-card    { animation: rise .55s cubic-bezier(.22,1,.36,1) .16s both; }
+.wave-card    { animation: rise .55s cubic-bezier(.22,1,.36,1) .24s both; }
+.webcam-section{ animation: rise .55s cubic-bezier(.22,1,.36,1) .32s both; }
 
-/* DIR TEXT */
-.wind-dir-info{flex:1;min-width:0}
-.wind-abbr{font-family:var(--display);font-size:52px;letter-spacing:2px;line-height:1}
-.wind-abbr.da-terra{color:#ff6b81}
-.wind-abbr.da-mare{color:var(--accent)}
-.wind-deg{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-top:5px}
+/* ═══════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════ */
+header {
+  padding: 24px 24px 14px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
 
-/* ★ WEATHER WIDGET — invariato nel token styling, pura aggiunta */
-.wx-widget{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:11px 10px 9px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14);border-radius:16px;min-width:65px}
-.wx-icon{font-size:22px;line-height:1;filter:drop-shadow(0 0 5px rgba(0,212,255,.3))}
-.wx-temp{font-family:var(--display);font-size:26px;letter-spacing:1px;line-height:1}
-.wx-cond{font-family:var(--mono);font-size:6.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;text-align:center;line-height:1.6;white-space:pre-line}
+.logo h1 {
+  font-family: var(--disp);
+  font-size: 54px; letter-spacing: 4px; line-height: 1;
+  background: linear-gradient(140deg, #ffffff 30%, var(--accent) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 28px rgba(0,200,240,.18));
+}
 
-/* FORECAST */
-.forecast-sep{height:1px;background:rgba(255,255,255,.06);margin-bottom:16px}
-.forecast-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
-.forecast-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.forecast-scroll::-webkit-scrollbar{display:none}
-.forecast-row{display:flex;gap:8px;padding-bottom:2px}
-.fi{flex-shrink:0;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px 10px;text-align:center;min-width:56px}
-.fi-time{font-family:var(--mono);font-size:7px;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
-.fi-dir{font-family:var(--display);font-size:20px;letter-spacing:1px;line-height:1}
-.fi-dir.da-terra{color:#ff6b81}
-.fi-dir.da-mare{color:var(--accent)}
-.fi-deg{font-family:var(--mono);font-size:7px;letter-spacing:1px;color:rgba(232,244,255,.22);margin-top:3px}
+.logo .sub {
+  font-family: var(--mono);
+  font-size: 8.5px; letter-spacing: 4px;
+  color: var(--text-3);
+  text-transform: uppercase; margin-top: 5px;
+}
 
-/* WAVE CARD */
-.wave-card{margin:0 24px 16px;background:rgba(10,25,50,.65);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;align-items:center;gap:14px}
-.wave-svg svg{width:68px;height:38px;display:block}
-.wave-info{flex:1}
-.wave-height{font-family:var(--display);font-size:42px;letter-spacing:2px;line-height:1}
-.wave-sub{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
-.wave-dir-box{text-align:right}
-.wave-dir-label{font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
-.wave-dir-val{font-family:var(--display);font-size:38px;letter-spacing:2px;line-height:1}
+.header-right { text-align: right; }
 
-/* WEBCAM — stessa struttura .vbox del test-stream originale */
-.webcam-section{margin:0 24px 8px}
-.webcam-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.webcam-label{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
-.live-badge{display:flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.28);border-radius:20px;font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--warn);text-transform:uppercase}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--warn);animation:blink 1.4s infinite}
-.vbox{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--border);background:#000;aspect-ratio:16/9}
-.vbox iframe{width:100%;height:100%;border:none;display:block}
-.vlabel{position:absolute;top:10px;left:10px;z-index:3;font-family:var(--mono);font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.65);background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:4px 10px;border-radius:20px;text-transform:uppercase;pointer-events:none}
+.time-display {
+  font-family: var(--disp);
+  font-size: 44px; letter-spacing: 2px; line-height: 1;
+  color: var(--text);
+  text-shadow: 0 0 40px rgba(0,200,240,.12);
+}
 
-footer{text-align:center;padding:16px 24px 0;font-family:var(--mono);font-size:7px;letter-spacing:3px;color:rgba(255,255,255,.1);text-transform:uppercase}
+.date-display {
+  font-family: var(--mono);
+  font-size: 8.5px; letter-spacing: 3px;
+  color: var(--text-3);
+  text-transform: uppercase; margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STATUS BAR
+   ═══════════════════════════════════════════════════════ */
+.status-bar {
+  margin: 4px 24px 20px;
+  padding: 10px 14px 10px 16px;
+  background: rgba(255,255,255,.025);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  display: flex; align-items: center; gap: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-pill);
+}
+
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #1fffa0; flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(31,255,160,.5);
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,100% { opacity: 1; box-shadow: 0 0 8px rgba(31,255,160,.5); }
+  50%      { opacity: .35; box-shadow: 0 0 3px rgba(31,255,160,.2); }
+}
+
+.status-text {
+  font-family: var(--mono);
+  font-size: 8.5px; letter-spacing: 3px;
+  color: var(--text-3); text-transform: uppercase; flex: 1;
+}
+
+.status-refresh {
+  width: 26px; height: 26px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,.04);
+  color: var(--text-3); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s, color .2s, transform .15s;
+}
+.status-refresh:hover  { background: rgba(255,255,255,.08); color: var(--text); }
+.status-refresh:active { transform: scale(.9); }
+.spin { animation: rotateSpin .65s cubic-bezier(.4,0,.2,1); }
+@keyframes rotateSpin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════════════
+   SHADOW TOKEN — 3D depth system, used everywhere
+   Layer 1: top highlight inset (simula luce zenitale)
+   Layer 2: penumbra diffusa media
+   Layer 3: ombra profonda lunga
+   Layer 4: micro-ombra di contatto
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --shadow-card:
+    0 1px 0 rgba(255,255,255,.05) inset,
+    0 2px 6px rgba(0,0,0,.22),
+    0 10px 28px rgba(0,0,0,.28),
+    0 28px 56px rgba(0,0,0,.22);
+  --shadow-widget:
+    0 1px 0 rgba(255,255,255,.04) inset,
+    0 2px 4px rgba(0,0,0,.18),
+    0 8px 20px rgba(0,0,0,.22),
+    0 16px 36px rgba(0,0,0,.16);
+  --shadow-chip:
+    0 1px 0 rgba(255,255,255,.03) inset,
+    0 2px 4px rgba(0,0,0,.16),
+    0 6px 14px rgba(0,0,0,.18);
+  --shadow-pill:
+    0 1px 0 rgba(255,255,255,.04) inset,
+    0 2px 8px rgba(0,0,0,.18),
+    0 8px 24px rgba(0,0,0,.16);
+  --shadow-video:
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 4px 12px rgba(0,0,0,.3),
+    0 16px 40px rgba(0,0,0,.38),
+    0 32px 64px rgba(0,0,0,.28);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARD BASE — shared surface token
+   ═══════════════════════════════════════════════════════ */
+.wind-card,
+.wave-card {
+  margin: 0 20px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: var(--shadow-card);
+}
+
+.wind-card { padding: 22px 20px 18px; }
+.wave-card { padding: 20px; display: flex; align-items: center; gap: 16px; }
+
+/* ── Section label ─────────────────────────────────── */
+.card-label {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 4px;
+  color: var(--text-3); text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   WIND MAIN — 4-column flex
+   ═══════════════════════════════════════════════════════ */
+.wind-main {
+  display: flex; align-items: center; gap: 11px;
+  margin-bottom: 22px;
+}
+
+/* ── Compass ────────────────────────────────────────── */
+.compass {
+  flex-shrink: 0; width: 92px; height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(0,200,240,.04), rgba(0,0,0,.4));
+  border: 1px solid var(--border-hi);
+  position: relative;
+  box-shadow:
+    0 0 0 4px rgba(0,200,240,.03),
+    0 8px 24px rgba(0,0,0,.3) inset;
+}
+
+/* Cardinal marks */
+.compass::before,
+.compass::after {
+  content: '';
+  position: absolute; border-radius: 1px;
+  background: rgba(255,255,255,.08);
+}
+.compass::before { /* vertical tick */
+  width: 1px; height: 8px;
+  top: 8px; left: 50%; transform: translateX(-50%);
+}
+.compass::after { /* horizontal tick — rotated via pseudo-trick not possible, skip */
+  width: 1px; height: 8px;
+  bottom: 8px; left: 50%; transform: translateX(-50%);
+}
+
+.c-n {
+  position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+  font-family: var(--mono); font-size: 8px; letter-spacing: 1px;
+  color: var(--accent); opacity: .7;
+}
+
+.c-needle {
+  position: absolute; top: 50%; left: 50%;
+  width: 2px; height: 44px;
+  margin-left: -1px; margin-top: -36px;
+  transform-origin: bottom center;
+  transition: transform 1.1s cubic-bezier(.34,1.56,.64,1);
+}
+
+.c-tip {
+  height: 28px;
+  background: linear-gradient(to bottom, #f0566a, rgba(240,86,106,.15));
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 0 10px rgba(240,86,106,.4);
+}
+
+.c-tail {
+  height: 16px;
+  background: rgba(255,255,255,.1);
+  border-radius: 0 0 2px 2px;
+}
+
+.c-dot {
+  position: absolute; top: 50%; left: 50%;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,.4);
+  transform: translate(-50%,-50%);
+}
+
+/* ── Direction text ─────────────────────────────────── */
+.wind-dir-info { flex: 1; min-width: 0; }
+
+.wind-abbr {
+  font-family: var(--disp);
+  font-size: 54px; letter-spacing: 2px; line-height: 1;
+  transition: color .4s ease;
+}
+.wind-abbr.da-terra {
+  color: #f0566a;
+  text-shadow: 0 0 32px rgba(240,86,106,.3);
+}
+.wind-abbr.da-mare {
+  color: var(--accent);
+  text-shadow: 0 0 32px rgba(0,200,240,.25);
+}
+
+.wind-deg {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 2px;
+  color: var(--text-3); margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MICRO-WIDGETS — speed + weather
+   Shared design token: identical shape, different accent
+   ═══════════════════════════════════════════════════════ */
+.spd-widget,
+.wx-widget {
+  flex-shrink: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  padding: 13px 11px 11px;
+  border-radius: var(--r-widget);
+  min-width: 64px;
+  position: relative; overflow: hidden;
+  transition: border-color .3s, box-shadow .3s;
+}
+
+/* Speed widget — warm coral tint */
+.spd-widget {
+  background: rgba(240,86,106,.05);
+  border: 1px solid rgba(240,86,106,.16);
+  box-shadow: var(--shadow-widget);
+}
+.spd-widget::before {
+  content: ''; position: absolute;
+  top: -18px; right: -18px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: rgba(240,86,106,.06);
+  pointer-events: none;
+}
+
+/* Weather widget — cool ciano tint */
+.wx-widget {
+  background: rgba(0,200,240,.04);
+  border: 1px solid rgba(0,200,240,.14);
+  box-shadow: var(--shadow-widget);
+}
+.wx-widget::before {
+  content: ''; position: absolute;
+  top: -18px; right: -18px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: rgba(0,200,240,.05);
+  pointer-events: none;
+}
+
+.spd-icon,
+.wx-icon {
+  font-size: 20px; line-height: 1;
+}
+.spd-icon { filter: drop-shadow(0 0 6px rgba(240,86,106,.35)); }
+.wx-icon  { filter: drop-shadow(0 0 6px rgba(0,200,240,.30)); }
+
+.spd-val,
+.wx-temp {
+  font-family: var(--disp);
+  font-size: 26px; letter-spacing: 1px; line-height: 1;
+  color: var(--text);
+}
+
+.spd-unit,
+.wx-cond {
+  font-family: var(--mono);
+  font-size: 6px; letter-spacing: 1.5px;
+  color: var(--text-3); text-transform: uppercase;
+  text-align: center; line-height: 1.6; white-space: pre-line;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FORECAST STRIP
+   ═══════════════════════════════════════════════════════ */
+.forecast-sep {
+  height: 1px; margin-bottom: 18px;
+  background: linear-gradient(90deg, transparent, var(--border-hi), transparent);
+}
+
+.forecast-label {
+  font-family: var(--mono);
+  font-size: 7.5px; letter-spacing: 4px;
+  color: var(--text-3); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.forecast-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.forecast-scroll::-webkit-scrollbar { display: none; }
+
+.forecast-row { display: flex; gap: 7px; padding-bottom: 2px; }
+
+.fi {
+  flex-shrink: 0;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(255,255,255,.05);
+  border-radius: var(--r-chip);
+  padding: 9px 10px 8px;
+  text-align: center; min-width: 55px;
+  box-shadow: var(--shadow-chip);
+  transition: background .2s, border-color .2s;
+}
+.fi:hover {
+  background: rgba(255,255,255,.045);
+  border-color: rgba(255,255,255,.09);
+}
+
+.fi-time {
+  font-family: var(--mono);
+  font-size: 6.5px; letter-spacing: 1px;
+  color: var(--text-3); margin-bottom: 6px;
+}
+
+.fi-dir {
+  font-family: var(--disp);
+  font-size: 20px; letter-spacing: 1px; line-height: 1;
+  transition: color .3s;
+}
+.fi-dir.da-terra { color: #f0566a; }
+.fi-dir.da-mare  { color: var(--accent); }
+
+.fi-deg {
+  font-family: var(--mono);
+  font-size: 6.5px; letter-spacing: 1px;
+  color: var(--text-3); margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   WAVE CARD
+   ═══════════════════════════════════════════════════════ */
+.wave-svg svg { width: 64px; height: 36px; display: block; opacity: .75; }
+
+.wave-info { flex: 1; }
+
+.wave-height {
+  font-family: var(--disp);
+  font-size: 32px; letter-spacing: 2px; line-height: 1;
+  color: var(--text);
+}
+
+/* ── Mini compass (onde) ────────────────────────────── */
+.mini-compass {
+  flex-shrink: 0;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(0,200,240,.05), rgba(0,0,0,.4));
+  border: 1px solid var(--border-hi);
+  position: relative;
+  box-shadow:
+    0 0 0 3px rgba(0,200,240,.04),
+    0 4px 12px rgba(0,0,0,.3) inset,
+    var(--shadow-widget);
+}
+.mc-n {
+  position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+  font-family: var(--mono); font-size: 6px; letter-spacing: .5px;
+  color: var(--accent); opacity: .65; line-height: 1;
+}
+.mc-needle {
+  position: absolute; top: 50%; left: 50%;
+  width: 1.5px; height: 24px;
+  margin-left: -.75px; margin-top: -19px;
+  transform-origin: bottom center;
+  transition: transform 1.1s cubic-bezier(.34,1.56,.64,1);
+}
+.mc-tip  { height: 15px; background: linear-gradient(to bottom, var(--accent), rgba(0,200,240,.15)); border-radius: 1px 1px 0 0; box-shadow: 0 0 6px rgba(0,200,240,.45); }
+.mc-tail { height: 9px;  background: rgba(255,255,255,.1); border-radius: 0 0 1px 1px; }
+.mc-dot  { position: absolute; top:50%; left:50%; width:4px; height:4px; border-radius:50%; background:#fff; box-shadow:0 0 4px rgba(255,255,255,.4); transform:translate(-50%,-50%); }
+
+.wave-sub {
+  font-family: var(--mono);
+  font-size: 7.5px; letter-spacing: 3.5px;
+  color: var(--text-3); text-transform: uppercase; margin-top: 5px;
+}
+
+.wave-dir-box { text-align: right; }
+
+.wave-dir-label {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 3px;
+  color: var(--text-3); text-transform: uppercase; margin-bottom: 3px;
+}
+
+.wave-dir-val {
+  font-family: var(--disp);
+  font-size: 38px; letter-spacing: 2px; line-height: 1;
+  color: var(--accent);
+  text-shadow: 0 0 24px rgba(0,200,240,.2);
+}
+
+/* ═══════════════════════════════════════════════════════
+   WEBCAM
+   ═══════════════════════════════════════════════════════ */
+.webcam-section { margin: 0 20px 8px; }
+
+.webcam-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+}
+
+.webcam-label {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 4px;
+  color: var(--text-3); text-transform: uppercase;
+}
+
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 11px;
+  background: rgba(240,86,106,.09);
+  border: 1px solid rgba(240,86,106,.22);
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 2px;
+  color: #f0566a; text-transform: uppercase;
+  box-shadow: var(--shadow-pill);
+}
+
+.live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #f0566a;
+  box-shadow: 0 0 6px rgba(240,86,106,.6);
+  animation: blink 1.6s ease-in-out infinite;
+}
+
+.vbox {
+  position: relative;
+  border-radius: 18px; overflow: hidden;
+  border: 1px solid var(--border);
+  background: #000;
+  aspect-ratio: 16/9;
+  box-shadow: var(--shadow-video);
+}
+
+.vbox iframe { width: 100%; height: 100%; border: none; display: block; }
+
+.vlabel {
+  position: absolute; top: 10px; left: 10px; z-index: 3;
+  font-family: var(--mono);
+  font-size: 6.5px; letter-spacing: 2.5px;
+  color: rgba(255,255,255,.6);
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  padding: 4px 11px; border-radius: var(--r-pill);
+  text-transform: uppercase; pointer-events: none;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════ */
+footer {
+  text-align: center; padding: 20px 24px 0;
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 4px;
+  color: var(--text-3); text-transform: uppercase;
+}
 </style>
 </head>
 <body>
@@ -176,6 +645,15 @@ footer{text-align:center;padding:16px 24px 0;font-family:var(--mono);font-size:7
     <div class="wave-info">
       <div class="wave-height" id="waveHbig">-- CM</div>
       <div class="wave-sub">SWELL HEIGHT</div>
+    </div>
+    <!-- mini bussola direzione onde -->
+    <div class="mini-compass">
+      <div class="mc-n">N</div>
+      <div class="mc-needle" id="waveNeedle">
+        <div class="mc-tip"></div>
+        <div class="mc-tail"></div>
+      </div>
+      <div class="mc-dot"></div>
     </div>
     <div class="wave-dir-box">
       <div class="wave-dir-label">DIR. ONDE</div>
@@ -275,8 +753,10 @@ async function loadAll(){
     /* onde */
     if(marine?.current){
       const wcm=Math.round(marine.current.wave_height*100);
+      const waveDir=marine.current.wave_direction;
       document.getElementById('waveHbig').textContent=wcm+' CM';
-      document.getElementById('waveDirVal').textContent=degToCompass(marine.current.wave_direction);
+      document.getElementById('waveDirVal').textContent=degToCompass(waveDir);
+      document.getElementById('waveNeedle').style.transform=`rotate(${waveDir}deg)`;
     }
 
     /* meteo */
