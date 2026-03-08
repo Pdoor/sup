@@ -292,7 +292,7 @@ header {
    ═══════════════════════════════════════════════════════ */
 .wind-card,
 .wave-card {
-  margin: 0 14px 7px;
+  margin: 0 14px 5px;
   border: 1px solid rgba(255,255,255,.07);
   border-top: 1px solid rgba(255,255,255,.22);
   border-bottom: 1px solid rgba(0,0,0,.75);
@@ -323,24 +323,24 @@ header {
     0 40px 72px rgba(0,0,0,.32);
 }
 
-.wind-card { padding: 14px 16px 13px; }
-.wave-card { padding: 13px 16px; display: flex; align-items: center; gap: 12px; }
+.wind-card { padding: 10px 14px 10px; }
+.wave-card { padding: 9px 14px; display: flex; align-items: center; gap: 10px; }
 
 /* ── Section label ─────────────────────────────────── */
 .card-label {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
   color: var(--text-3); text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 /* ═══════════════════════════════════════════════════════
    WIND MAIN — colonna sinistra + wx a destra full-height
    ═══════════════════════════════════════════════════════ */
 .wind-main {
-  display: flex; flex-direction: row; gap: 10px;
+  display: flex; flex-direction: row; gap: 8px;
   align-items: stretch;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 /* Colonna sinistra: compass/dir sopra, speed sotto */
@@ -350,7 +350,7 @@ header {
 }
 
 .wind-top-row {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 10px;
 }
 
 .wind-widgets-row {
@@ -397,7 +397,7 @@ header {
 
 /* ── Compass ────────────────────────────────────────── */
 .compass {
-  flex-shrink: 0; width: 78px; height: 78px;
+  flex-shrink: 0; width: 68px; height: 68px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.04), rgba(0,0,0,.5));
   border: 1px solid rgba(255,255,255,.07);
@@ -445,7 +445,7 @@ header {
   width: 0; height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 28px solid #f0566a;
+  border-bottom: 22px solid #f0566a;
   filter: drop-shadow(0 0 6px rgba(240,86,106,.6));
 }
 
@@ -457,7 +457,7 @@ header {
   width: 0; height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 24px solid rgba(255,255,255,.75);
+  border-top: 20px solid rgba(255,255,255,.75);
   filter: drop-shadow(0 0 4px rgba(255,255,255,.35));
 }
 
@@ -478,7 +478,7 @@ header {
 
 .wind-abbr {
   font-family: var(--disp);
-  font-size: 30px; letter-spacing: 1px; line-height: 1;
+  font-size: 22px; letter-spacing: 1px; line-height: 1;
   transition: color .4s ease;
 }
 .wind-abbr.da-terra {
@@ -492,8 +492,8 @@ header {
 
 .wind-deg {
   font-family: var(--mono);
-  font-size: 9px; letter-spacing: 2px;
-  color: var(--text-3); margin-top: 4px;
+  font-size: 8px; letter-spacing: 1.5px;
+  color: var(--text-3); margin-top: 3px;
 }
 
 .wind-from-row,
@@ -610,15 +610,15 @@ header {
    FORECAST STRIP
    ═══════════════════════════════════════════════════════ */
 .forecast-sep {
-  height: 1px; margin-bottom: 10px;
+  height: 1px; margin-bottom: 6px;
   background: linear-gradient(90deg, transparent, var(--border-hi), transparent);
 }
 
 .forecast-label {
   font-family: var(--mono);
-  font-size: 7px; letter-spacing: 4px;
+  font-size: 6.5px; letter-spacing: 3px;
   color: var(--text-3); text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 
 .forecast-scroll {
@@ -685,13 +685,13 @@ header {
 /* ═══════════════════════════════════════════════════════
    WAVE CARD
    ═══════════════════════════════════════════════════════ */
-.wave-svg svg { width: 64px; height: 36px; display: block; opacity: .75; }
+.wave-svg svg { width: 36px; height: 28px; display: block; opacity: .75; }
 
 .wave-info { flex: 1; }
 
 .wave-height {
   font-family: var(--disp);
-  font-size: 26px; letter-spacing: 2px; line-height: 1;
+  font-size: 15px; letter-spacing: 1px; line-height: 1;
   color: #e8fff4;
   text-shadow:
     0 1px 0 rgba(255,255,255,.14),
@@ -759,8 +759,36 @@ header {
 
 .wave-sub {
   font-family: var(--mono);
-  font-size: 7.5px; letter-spacing: 3.5px;
-  color: rgba(180,255,220,.35); text-transform: uppercase; margin-top: 5px;
+  font-size: 7px; letter-spacing: 3px;
+  color: rgba(180,255,220,.35); text-transform: uppercase; margin-top: 3px;
+}
+
+.wave-period-row {
+  display: flex; align-items: baseline; gap: 3px;
+  margin-top: 3px;
+}
+
+.wave-period-val {
+  font-family: var(--disp);
+  font-size: 16px; letter-spacing: 1px; line-height: 1;
+  color: #e8fff4;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.12),
+    0 2px 0 rgba(0,0,0,.65),
+    0 0 20px rgba(0,210,120,.12);
+}
+
+.wave-period-unit {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 2px;
+  color: rgba(180,255,220,.40); text-transform: uppercase;
+}
+
+.wave-period-label {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 3px;
+  color: rgba(180,255,220,.35); text-transform: uppercase;
+  margin-top: 2px;
 }
 
 .wave-dir-box { text-align: right; }
@@ -773,7 +801,7 @@ header {
 
 .wave-dir-val {
   font-family: var(--disp);
-  font-size: 30px; letter-spacing: 2px; line-height: 1;
+  font-size: 22px; letter-spacing: 1px; line-height: 1;
   color: #00d278;
   text-shadow:
     0 1px 0 rgba(255,255,255,.12),
@@ -942,7 +970,12 @@ footer {
     </div>
     <div class="wave-info">
       <div class="wave-height" id="waveHbig">-- CM</div>
-      <div class="wave-sub">SWELL HEIGHT</div>
+      <div class="wave-sub">ALTEZZA</div>
+      <div class="wave-period-row">
+        <div class="wave-period-val" id="wavePeriod">--</div>
+        <div class="wave-period-unit">sec</div>
+      </div>
+      <div class="wave-period-label">PERIODO</div>
     </div>
     <!-- mini bussola direzione onde -->
     <div class="mini-compass">
@@ -1044,7 +1077,7 @@ function wmoInfo(c){
 }
 
 /* ── LOADING STATE ─────────────────────────── */
-const LOADING_IDS = ['windAbbr','windDeg','windSpd','windFrom','windTo','waveHbig','waveDirVal','wxIcon','wxTemp','wxCond'];
+const LOADING_IDS = ['windAbbr','windDeg','windSpd','windFrom','windTo','waveHbig','wavePeriod','waveDirVal','wxIcon','wxTemp','wxCond'];
 function setLoading(on){
   LOADING_IDS.forEach(id=>{
     const el=document.getElementById(id);
@@ -1058,7 +1091,7 @@ async function loadAll(){
   setLoading(true);
   try{
     const [mRes,wRes,xRes]=await Promise.all([
-      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction&timezone=Europe/Rome`),
+      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period&timezone=Europe/Rome`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&timezone=Europe/Rome`)
     ]);
@@ -1082,9 +1115,11 @@ async function loadAll(){
     if(marine?.current){
       const wcm=Math.round(marine.current.wave_height*100);
       const waveDir=marine.current.wave_direction;
-      document.getElementById('waveHbig').textContent=wcm+' CM';
+      const wavePer=marine.current.wave_period!=null ? Math.round(marine.current.wave_period*10)/10 : '--';
+      document.getElementById('waveHbig').textContent=wcm+' cm';
       document.getElementById('waveDirVal').textContent=degToCompass(waveDir);
       document.getElementById('waveNeedle').style.transform=`rotate(${waveDir}deg)`;
+      document.getElementById('wavePeriod').textContent=wavePer;
     }
 
     /* meteo */
