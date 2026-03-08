@@ -442,7 +442,7 @@ header {
   color: rgba(220,235,255,.38); text-transform: uppercase;
 }
 
-.wx-fi-i { font-size: 13px; line-height: 1; }
+.wx-fi-i { font-size: 16px; line-height: 1.2; display: block; }
 
 /* ── Compass ────────────────────────────────────────── */
 .compass {
@@ -594,7 +594,7 @@ header {
   padding: 13px 11px 11px;
   border-radius: var(--r-widget);
   min-width: 64px;
-  position: relative; overflow: hidden;
+  position: relative; overflow: visible;
   transition: border-color .3s, box-shadow .3s;
 }
 
@@ -1208,30 +1208,30 @@ function windClass(deg){
 }
 
 function wmoInfo(c){
-  // WMO Weather Interpretation Codes — specifica completa
-  if(c===0)              return{icon:'☀️', label:'SOLEGGIATO'};
-  if(c===1)              return{icon:'🌤️', label:'POCO\\nNUVOLOSO'};
-  if(c===2)              return{icon:'⛅',  label:'PARZ.\\nNUVOLOSO'};
-  if(c===3)              return{icon:'☁️', label:'COPERTO'};
-  if(c>=10&&c<=19)       return{icon:'🌫️', label:'FOSCHIA'};
-  if(c>=20&&c<=29)       return{icon:'🌦️', label:'PREC.\\nRECENTI'};
-  if(c>=30&&c<=39)       return{icon:'💨', label:'BUFERA\\nSABBIA'};
-  if(c>=40&&c<=49)       return{icon:'🌫️', label:'NEBBIA'};
-  if(c===51||c===53)     return{icon:'🌦️', label:'PIOVIGGINE\\nLEGGERA'};
-  if(c===55)             return{icon:'🌦️', label:'PIOVIGGINE\\nINTENSA'};
-  if(c===56||c===57)     return{icon:'🌨️', label:'PIOVIGGINE\\nGELATA'};
-  if(c===61||c===63)     return{icon:'🌧️', label:'PIOGGIA'};
-  if(c===65)             return{icon:'🌧️', label:'PIOGGIA\\nINTENSA'};
-  if(c===66||c===67)     return{icon:'🌨️', label:'PIOGGIA\\nGELATA'};
-  if(c===71||c===73)     return{icon:'❄️', label:'NEVE'};
-  if(c===75)             return{icon:'❄️', label:'NEVE\\nINTENSA'};
-  if(c===77)             return{icon:'🌨️', label:'NEVISCHIO'};
-  if(c===80||c===81)     return{icon:'🌦️', label:'ROVESCI'};
-  if(c===82)             return{icon:'🌧️', label:'ROVESCI\\nINTENSI'};
-  if(c===85||c===86)     return{icon:'🌨️', label:'ROVESCI\\nNEVE'};
-  if(c===95)             return{icon:'⛈️', label:'TEMPORALE'};
-  if(c===96||c===99)     return{icon:'⛈️', label:'TEMPORA.\\nGRANDINE'};
-  return                        {icon:'🌡️', label:'N/D'};
+  // WMO Weather Interpretation Codes — variation selector \uFE0F forzato su tutti
+  if(c===0)              return{icon:'\u2600\uFE0F',  label:'SOLEGGIATO'};
+  if(c===1)              return{icon:'\uD83C\uDF24\uFE0F', label:'POCO\nNUVOLOSO'};
+  if(c===2)              return{icon:'\u26C5\uFE0F',  label:'PARZ.\nNUVOLOSO'};
+  if(c===3)              return{icon:'\u2601\uFE0F',  label:'COPERTO'};
+  if(c>=10&&c<=19)       return{icon:'\uD83C\uDF2B\uFE0F', label:'FOSCHIA'};
+  if(c>=20&&c<=29)       return{icon:'\uD83C\uDF26\uFE0F', label:'PREC.\nRECENTI'};
+  if(c>=30&&c<=39)       return{icon:'\uD83D\uDCA8',  label:'BUFERA\nSABBIA'};
+  if(c>=40&&c<=49)       return{icon:'\uD83C\uDF2B\uFE0F', label:'NEBBIA'};
+  if(c===51||c===53)     return{icon:'\uD83C\uDF26\uFE0F', label:'PIOVIGG.\nLEGGERA'};
+  if(c===55)             return{icon:'\uD83C\uDF26\uFE0F', label:'PIOVIGG.\nINTENSA'};
+  if(c===56||c===57)     return{icon:'\uD83C\uDF28\uFE0F', label:'PIOVIGG.\nGELATA'};
+  if(c===61||c===63)     return{icon:'\uD83C\uDF27\uFE0F', label:'PIOGGIA'};
+  if(c===65)             return{icon:'\uD83C\uDF27\uFE0F', label:'PIOGGIA\nINTENSA'};
+  if(c===66||c===67)     return{icon:'\uD83C\uDF28\uFE0F', label:'PIOGGIA\nGELATA'};
+  if(c===71||c===73)     return{icon:'\u2744\uFE0F',  label:'NEVE'};
+  if(c===75)             return{icon:'\u2744\uFE0F',  label:'NEVE\nINTENSA'};
+  if(c===77)             return{icon:'\uD83C\uDF28\uFE0F', label:'NEVISCHIO'};
+  if(c===80||c===81)     return{icon:'\uD83C\uDF26\uFE0F', label:'ROVESCI'};
+  if(c===82)             return{icon:'\uD83C\uDF27\uFE0F', label:'ROVESCI\nINTENSI'};
+  if(c===85||c===86)     return{icon:'\uD83C\uDF28\uFE0F', label:'ROVESCI\nNEVE'};
+  if(c===95)             return{icon:'\u26C8\uFE0F',  label:'TEMPORALE'};
+  if(c===96||c===99)     return{icon:'\u26C8\uFE0F',  label:'TEMPORA.\nGRANDINE'};
+  return                        {icon:'\uD83C\uDF21\uFE0F', label:'N/D'};
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1387,15 +1387,19 @@ async function loadAll(){
     if(wx.hourly?.time && wx.hourly?.weathercode){
       const wxTimes=wx.hourly.time, wxCodes=wx.hourly.weathercode;
       const fcast=document.getElementById('wxForecast');
-      const slots=fcast.querySelectorAll('.wx-fi');
-      const wxStartIdx = wxTimes.findIndex(s => new Date(s) > now);
-      let wxCnt=0;
-      for(let i=wxStartIdx; i<wxTimes.length&&wxCnt<5; i+=2){
+      let wxStartIdx=wxTimes.findIndex(s=>new Date(s)>now);
+      if(wxStartIdx<0) wxStartIdx=0;
+      fcast.innerHTML='';
+      for(let step=0;step<5;step++){
+        const i=wxStartIdx+(step*2);
+        if(i>=wxTimes.length) break;
         const t=new Date(wxTimes[i]);
         const hh=String(t.getHours()).padStart(2,'0');
-        slots[wxCnt].querySelector('.wx-fi-h').textContent=hh;
-        slots[wxCnt].querySelector('.wx-fi-i').textContent=wmoInfo(wxCodes[i]).icon;
-        wxCnt++;
+        const ico=wmoInfo(wxCodes[i]).icon;
+        const div=document.createElement('div');
+        div.className='wx-fi';
+        div.innerHTML=`<div class="wx-fi-h">${hh}</div><div class="wx-fi-i">${ico}</div>`;
+        fcast.appendChild(div);
       }
     }
 
