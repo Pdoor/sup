@@ -190,12 +190,11 @@ footer{text-align:center;padding:16px 24px 0;font-family:var(--mono);font-size:7
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
     </div>
     <div class="vbox">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/1A2PUj7SS5o?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3"
+      <iframe id="webcamIframe" src=""
         allow="autoplay;encrypted-media;picture-in-picture"
-        allowfullscreen
-        playsinline
-        referrerpolicy="no-referrer">
+        allowfullscreen playsinline loading="lazy"
+        referrerpolicy="no-referrer"
+        title="Webcam Torre Pedrera">
       </iframe>
       <div class="vlabel">TORRE PEDRERA</div>
     </div>
@@ -205,6 +204,15 @@ footer{text-align:center;padding:16px 24px 0;font-family:var(--mono);font-size:7
 </div>
 
 <script>
+/* ── WEBCAM: src iniettato via JS (sblocca autoplay iOS/Safari) ── */
+const VID = '1A2PUj7SS5o';
+const WEBCAM_SRC = 'https://www.youtube-nocookie.com/embed/'+VID+'?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3';
+
+function initWebcam(){
+  document.getElementById('webcamIframe').src = WEBCAM_SRC;
+}
+window.addEventListener('load', initWebcam);
+
 /* ── CONFIG ─────────────────────────────── */
 const LAT = 44.07, LON = 12.62;  // Torre Pedrera, Rimini
 
