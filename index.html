@@ -1383,24 +1383,25 @@ async function loadAll(){
     document.getElementById('wxCond').textContent=label;
 
     /* meteo forecast biorario */
+    const now=new Date();
     if(wx.hourly?.time && wx.hourly?.weathercode){
       const wxTimes=wx.hourly.time, wxCodes=wx.hourly.weathercode;
       const fcast=document.getElementById('wxForecast');
       const slots=fcast.querySelectorAll('.wx-fi');
-      let cnt=0;
-      for(let i=0;i<wxTimes.length&&cnt<5;i++){
+      let wxCnt=0;
+      for(let i=0;i<wxTimes.length&&wxCnt<5;i++){
         const t=new Date(wxTimes[i]);
         if(t>now && t.getHours()%2===0){
           const hh=String(t.getHours()).padStart(2,'0');
-          slots[cnt].querySelector('.wx-fi-h').textContent=hh;
-          slots[cnt].querySelector('.wx-fi-i').textContent=wmoInfo(wxCodes[i]).icon;
-          cnt++;
+          slots[wxCnt].querySelector('.wx-fi-h').textContent=hh;
+          slots[wxCnt].querySelector('.wx-fi-i').textContent=wmoInfo(wxCodes[i]).icon;
+          wxCnt++;
         }
       }
     }
 
     /* forecast */
-    const now=new Date(), times=wind.hourly.time, wdirs=wind.hourly.winddirection_10m, wspds=wind.hourly.windspeed_10m;
+    const times=wind.hourly.time, wdirs=wind.hourly.winddirection_10m, wspds=wind.hourly.windspeed_10m;
     const row=document.getElementById('forecastRow');
     row.innerHTML=''; let cnt=0;
     for(let i=0;i<times.length&&cnt<8;i++){
