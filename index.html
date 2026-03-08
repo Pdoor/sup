@@ -1346,7 +1346,7 @@ async function loadAll(){
     const [mRes,wRes,xRes]=await Promise.all([
       fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period&timezone=Europe/Rome`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode&timezone=Europe/Rome`)
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode&timezone=Europe/Rome&forecast_days=2`)
     ]);
     const [marine,wind,wx]=await Promise.all([mRes.json(),wRes.json(),xRes.json()]);
 
@@ -1388,15 +1388,14 @@ async function loadAll(){
       const wxTimes=wx.hourly.time, wxCodes=wx.hourly.weathercode;
       const fcast=document.getElementById('wxForecast');
       const slots=fcast.querySelectorAll('.wx-fi');
+      const wxStartIdx = wxTimes.findIndex(s => new Date(s) > now);
       let wxCnt=0;
-      for(let i=0;i<wxTimes.length&&wxCnt<5;i++){
+      for(let i=wxStartIdx; i<wxTimes.length&&wxCnt<5; i+=2){
         const t=new Date(wxTimes[i]);
-        if(t>now && t.getHours()%2===0){
-          const hh=String(t.getHours()).padStart(2,'0');
-          slots[wxCnt].querySelector('.wx-fi-h').textContent=hh;
-          slots[wxCnt].querySelector('.wx-fi-i').textContent=wmoInfo(wxCodes[i]).icon;
-          wxCnt++;
-        }
+        const hh=String(t.getHours()).padStart(2,'0');
+        slots[wxCnt].querySelector('.wx-fi-h').textContent=hh;
+        slots[wxCnt].querySelector('.wx-fi-i').textContent=wmoInfo(wxCodes[i]).icon;
+        wxCnt++;
       }
     }
 
