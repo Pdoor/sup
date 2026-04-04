@@ -412,7 +412,7 @@ header {
   font-size: 6px;
   letter-spacing: 0.8px;
   text-align: right;
-  color: rgba(220,235,255,.28);
+  color: rgba(220,235,255,.62);
   text-transform: uppercase;
   line-height: 1;
 }
@@ -1237,19 +1237,19 @@ function degToCompass(d){
 }
 
 function beaufortDescription(kmh){
-  if(kmh<1)   return 'Bf 0 · Calma';
-  if(kmh<6)   return 'Bf 1 · Bava di vento';
-  if(kmh<12)  return 'Bf 2 · Brezza leggera';
-  if(kmh<20)  return 'Bf 3 · Brezza tesa';
-  if(kmh<29)  return 'Bf 4 · Vento moderato';
-  if(kmh<39)  return 'Bf 5 · Vento teso';
-  if(kmh<50)  return 'Bf 6 · Vento fresco';
-  if(kmh<62)  return 'Bf 7 · Vento forte';
-  if(kmh<75)  return 'Bf 8 · Burrasca';
-  if(kmh<89)  return 'Bf 9 · Burrasca forte';
-  if(kmh<103) return 'Bf 10 · Tempesta';
-  if(kmh<118) return 'Bf 11 · Tempesta violenta';
-  return 'Bf 12 · Uragano';
+  if(kmh<1)   return 'Bf0 · Calma';
+  if(kmh<6)   return 'Bf1 · Bava di vento';
+  if(kmh<12)  return 'Bf2 · Brezza leggera';
+  if(kmh<20)  return 'Bf3 · Brezza tesa';
+  if(kmh<29)  return 'Bf4 · Vento moderato';
+  if(kmh<39)  return 'Bf5 · Vento teso';
+  if(kmh<50)  return 'Bf6 · Vento fresco';
+  if(kmh<62)  return 'Bf7 · Vento forte';
+  if(kmh<75)  return 'Bf8 · Burrasca';
+  if(kmh<89)  return 'Bf9 · Burrasca forte';
+  if(kmh<103) return 'Bf10 · Tempesta';
+  if(kmh<118) return 'Bf11 · Tempesta violenta';
+  return 'Bf12 · Uragano';
 }
 
 // Torre Pedrera: costa EST sull'Adriatico. 
