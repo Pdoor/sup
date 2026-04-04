@@ -440,6 +440,30 @@ header {
 .wx-side .wx-icon { font-size: 18px; line-height: 1; }
 .wx-side .wx-temp { font-size: 22px; letter-spacing: 1px; }
 
+.wx-temp-sep {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: rgba(220,235,255,.20);
+  align-self: center;
+  margin: 0 1px;
+}
+
+.wx-water-temp {
+  font-family: var(--disp);
+  font-size: 18px; letter-spacing: 1px; line-height: 1;
+  color: var(--accent);
+  text-shadow: 0 0 14px rgba(0,200,240,.30);
+}
+
+.wx-water-label {
+  font-family: var(--mono);
+  font-size: 5.5px; letter-spacing: 1.2px;
+  color: rgba(0,200,240,.50);
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: -2px;
+}
+
 .wx-sep {
   width: 80%; height: 1px;
   background: rgba(0,200,240,.12);
@@ -1112,7 +1136,10 @@ footer {
         <div class="wx-current-row">
           <div class="wx-icon" id="wxIcon">&#x22EF;</div>
           <div class="wx-temp" id="wxTemp">--&#xB0;</div>
+          <div class="wx-temp-sep">|</div>
+          <div class="wx-water-temp" id="wxWaterTemp">--&#xB0;</div>
         </div>
+        <div class="wx-water-label">aria &nbsp;·&nbsp; mare</div>
         <div class="wx-cond" id="wxCond">---</div>
         <div class="wx-sep"></div>
         <div class="wx-forecast" id="wxForecast">
@@ -1475,7 +1502,7 @@ loadTideEstimate();
 setInterval(loadTideEstimate, 5*60*1000);
 
 /* ── LOADING STATE ─────────────────────────── */
-const LOADING_IDS = ['windAbbr','windDeg','windSpd','windFrom','windTo','waveHbig','wavePeriod','waveDirVal','wxIcon','wxTemp','wxCond'];
+const LOADING_IDS = ['windAbbr','windDeg','windSpd','windFrom','windTo','waveHbig','wavePeriod','waveDirVal','wxIcon','wxTemp','wxCond','wxWaterTemp'];
 function setLoading(on){
   LOADING_IDS.forEach(id=>{
     const el=document.getElementById(id);
@@ -1489,7 +1516,7 @@ async function loadAll(){
   setLoading(true);
   try{
     const [mRes,wRes,xRes]=await Promise.all([
-      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period&timezone=Europe/Rome`),
+      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period,sea_surface_temperature&timezone=Europe/Rome`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode&timezone=Europe/Rome&forecast_days=2`)
     ]);
@@ -1520,6 +1547,9 @@ async function loadAll(){
       document.getElementById('waveDirVal').className='wave-dir-val '+windClass(waveDir);
       document.getElementById('waveNeedle').style.transform=`rotate(${waveDir}deg)`;
       document.getElementById('wavePeriod').textContent=wavePer;
+      const sst=marine.current.sea_surface_temperature;
+      document.getElementById('wxWaterTemp').textContent=
+        sst!=null ? Math.round(sst*10)/10+'°' : '--°';
     }
 
     /* meteo */
