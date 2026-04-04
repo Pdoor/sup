@@ -396,9 +396,25 @@ header {
 
 .wind-widgets-row .spd-unit {
   font-size: 6.5px; letter-spacing: 1.5px;
-  text-align: left;
+  text-align: right;
+}
+
+.spd-unit-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   margin-left: auto;
   padding-left: 4px;
+  gap: 3px;
+}
+
+.beaufort-label {
+  font-size: 6px;
+  letter-spacing: 0.8px;
+  text-align: right;
+  color: rgba(220,235,255,.28);
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 /* wx meteo: colonna destra, stessa altezza totale */
@@ -1083,7 +1099,10 @@ footer {
           <div class="spd-widget">
             <div class="spd-icon">💨</div>
             <div class="spd-val" id="windSpd">--</div>
-            <div class="spd-unit">km/h</div>
+            <div class="spd-unit-col">
+              <div class="spd-unit">km/h</div>
+              <div class="beaufort-label" id="beaufortLabel">---</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1215,6 +1234,22 @@ tickClock(); setInterval(tickClock,1000);
 function degToCompass(d){
   const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
   return dirs[Math.round(((d%360)+360)%360/22.5)%16];
+}
+
+function beaufortDescription(kmh){
+  if(kmh<1)   return 'Bf 0 · Calma';
+  if(kmh<6)   return 'Bf 1 · Bava di vento';
+  if(kmh<12)  return 'Bf 2 · Brezza leggera';
+  if(kmh<20)  return 'Bf 3 · Brezza tesa';
+  if(kmh<29)  return 'Bf 4 · Vento moderato';
+  if(kmh<39)  return 'Bf 5 · Vento teso';
+  if(kmh<50)  return 'Bf 6 · Vento fresco';
+  if(kmh<62)  return 'Bf 7 · Vento forte';
+  if(kmh<75)  return 'Bf 8 · Burrasca';
+  if(kmh<89)  return 'Bf 9 · Burrasca forte';
+  if(kmh<103) return 'Bf 10 · Tempesta';
+  if(kmh<118) return 'Bf 11 · Tempesta violenta';
+  return 'Bf 12 · Uragano';
 }
 
 // Torre Pedrera: costa EST sull'Adriatico. 
@@ -1465,6 +1500,7 @@ async function loadAll(){
     const wSpd=Math.round(wind.current.windspeed_10m);
     document.getElementById('windSpd').textContent=wSpd;
     document.getElementById('windSpd').className='spd-val '+windClass(wDeg);
+    document.getElementById('beaufortLabel').textContent=beaufortDescription(wSpd);
     document.getElementById('windAbbr').textContent=degToCompass(wDeg);
     document.getElementById('windAbbr').className='wind-abbr '+windClass(wDeg);
     document.getElementById('windDeg').textContent=`${wDeg} °`;
