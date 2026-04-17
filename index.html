@@ -1029,6 +1029,39 @@ header {
   animation: blink 1.6s ease-in-out infinite;
 }
 
+/* ── Cam tabs ───────────────────────────────────────── */
+.cam-tabs {
+  display: flex; gap: 6px; margin-bottom: 10px;
+  margin-left: auto;
+}
+
+.cam-tab {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.18);
+  border-bottom: 1px solid rgba(0,0,0,.55);
+  background: rgba(255,255,255,.04);
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s, box-shadow .18s;
+  box-shadow: var(--shadow-chip);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cam-tab.active {
+  background: rgba(0,200,240,.13);
+  border-color: rgba(0,200,240,.30);
+  border-top-color: rgba(0,200,240,.50);
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(0,200,240,.18), var(--shadow-chip);
+}
+
+.cam-tab:not(.active):active { background: rgba(255,255,255,.08); }
+
+/* ── Video panels ───────────────────────────────────── */
 .vbox {
   position: relative;
   border-radius: 18px; overflow: hidden;
@@ -1038,9 +1071,56 @@ header {
   background: #000;
   aspect-ratio: 16/9;
   box-shadow: var(--shadow-video);
+  display: none;
 }
 
+.vbox.active { display: block; }
+
 .vbox iframe { width: 100%; height: 100%; border: none; display: block; }
+
+.vbox video {
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+  background: #000;
+}
+
+/* Overlay messaggi sul player Amerigo (connessione/errori) */
+.voverlay {
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-family: var(--mono);
+  text-align: center;
+  padding: 18px;
+  white-space: pre-line;
+}
+.voverlay-icon { font-size: 32px; line-height: 1; }
+.voverlay-msg  {
+  font-size: 8.5px; letter-spacing: 1.8px;
+  color: rgba(255,255,255,.82);
+  text-transform: uppercase;
+  max-width: 90%;
+}
+.voverlay-btn {
+  display: none;
+  margin-top: 6px;
+  padding: 8px 16px;
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.voverlay-btn:hover  { background: rgba(255,255,255,.14); }
+.voverlay-btn:active { background: rgba(255,255,255,.22); }
 
 .vlabel {
   position: absolute; top: 10px; left: 10px; z-index: 3;
@@ -1214,13 +1294,19 @@ footer {
     </div>
   </div>
 
-  <!-- WEBCAM: solo strategia 01 YouTube NoCookie — attributi identici all'originale -->
+  <!-- WEBCAM: due sorgenti — Torre Pedrera (YouTube) + Bagno Amerigo -->
   <div class="webcam-section">
     <div class="webcam-header">
       <div class="webcam-label">WEBCAM LIVE</div>
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+      <div class="cam-tabs">
+        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">HOTEL IDA</button>
+        <button class="cam-tab active" id="tabAmerigo" onclick="switchCam('amerigo')">B.AMERIGO</button>
+      </div>
     </div>
-    <div class="vbox">
+
+    <!-- Panel 1: Torre Pedrera YouTube -->
+    <div class="vbox" id="panelTorre">
       <iframe id="webcamIframe" src=""
         allow="autoplay;encrypted-media;picture-in-picture"
         allowfullscreen playsinline loading="lazy"
@@ -1229,19 +1315,133 @@ footer {
       </iframe>
       <div class="vlabel">TORRE PEDRERA</div>
     </div>
+
+    <!-- Panel 2: Bagno Amerigo — Worker proxy + HLS.js -->
+    <div class="vbox active" id="panelAmerigo">
+      <video id="amerigoVideo"
+             autoplay muted playsinline controls
+             preload="auto"
+             webkit-playsinline="true"></video>
+      <div class="voverlay" id="amerigoOverlay">
+        <div class="voverlay-icon" id="amerigoOverlayIcon">📡</div>
+        <div class="voverlay-msg"  id="amerigoOverlayMsg">CONNESSIONE IN CORSO…</div>
+        <button class="voverlay-btn" id="amerigoOverlayBtn" onclick="loadAmerigoStream()">RIPROVA</button>
+      </div>
+      <div class="vlabel">BAGNO AMERIGO</div>
+    </div>
   </div>
 
   <footer>MeteoSUP · Torre Pedrera · Adriatico</footer>
 </div>
 
 <script>
-/* ── WEBCAM: src iniettato via JS (sblocca autoplay iOS/Safari) ── */
+/* ── WEBCAM: Torre Pedrera (YouTube) ── */
 const VID = '1A2PUj7SS5o';
 const WEBCAM_SRC = 'https://www.youtube-nocookie.com/embed/'+VID+'?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3';
 
+/* ── WEBCAM: Bagno Amerigo — Cloudflare Worker proxy ── */
+const PROXY_URL  = 'https://skyline-proxy.gmeluzzi.workers.dev/stream/italia/emilia-romagna/rimini/torre-pedrera';
+
+let amerigoLoaded = false;
+let hlsInstance   = null;
+
 function initWebcam(){
   document.getElementById('webcamIframe').src = WEBCAM_SRC;
+  // Default view is AMERIGO - load stream immediately
+  amerigoLoaded = true;
+  loadAmerigoStream();
 }
+
+/* Mostra messaggio sull'overlay Amerigo */
+function amerigoStatus(icon, msg, showBtn){
+  document.getElementById('amerigoOverlayIcon').textContent = icon;
+  document.getElementById('amerigoOverlayMsg').textContent  = msg;
+  document.getElementById('amerigoOverlay').style.display   = showBtn === 'hide' ? 'none' : 'flex';
+  document.getElementById('amerigoOverlayBtn').style.display = showBtn === true ? 'block' : 'none';
+}
+
+async function loadAmerigoStream(){
+  amerigoStatus('📡', 'CONNESSIONE IN CORSO…', false);
+  document.getElementById('amerigoOverlayBtn').style.display = 'none';
+
+  let streamUrl;
+  try {
+    const resp = await fetch(PROXY_URL);
+    if (!resp.ok) throw new Error('proxy HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.stream) throw new Error('nessun campo stream');
+    streamUrl = data.stream;
+  } catch(e) {
+    console.error('Proxy Skyline error:', e);
+    amerigoStatus('⚠️', 'PROXY NON RAGGIUNGIBILE\nTocca per riprovare', true);
+    return;
+  }
+
+  const video = document.getElementById('amerigoVideo');
+
+  /* Distruggi istanza hls precedente se presente */
+  if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+
+  function startHLS(){
+    if (Hls.isSupported()) {
+      hlsInstance = new Hls({ lowLatencyMode: true, maxBufferLength: 10 });
+      hlsInstance.loadSource(streamUrl);
+      hlsInstance.attachMedia(video);
+      hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(()=>{});
+        amerigoStatus('', '', 'hide');
+      });
+      hlsInstance.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal) {
+          amerigoStatus('⚠️', 'STREAM INTERROTTO\nIl token è scaduto — ricarica', true);
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      /* Safari / iOS — HLS nativo */
+      video.src = streamUrl;
+      video.play().catch(()=>{});
+      amerigoStatus('', '', 'hide');
+    } else {
+      amerigoStatus('⚠️', 'HLS NON SUPPORTATO\nAggiorna il browser', false);
+    }
+  }
+
+  if (typeof Hls === 'undefined') {
+    amerigoStatus('📡', 'CARICAMENTO PLAYER…', false);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.7/hls.min.js';
+    s.onload  = startHLS;
+    s.onerror = () => amerigoStatus('⚠️', 'ERRORE CARICAMENTO PLAYER', true);
+    document.head.appendChild(s);
+  } else {
+    startHLS();
+  }
+}
+
+function switchCam(cam) {
+  const panelTorre   = document.getElementById('panelTorre');
+  const panelAmerigo = document.getElementById('panelAmerigo');
+  const tabTorre     = document.getElementById('tabTorre');
+  const tabAmerigo   = document.getElementById('tabAmerigo');
+
+  if (cam === 'torre') {
+    panelTorre.classList.add('active');
+    panelAmerigo.classList.remove('active');
+    tabTorre.classList.add('active');
+    tabAmerigo.classList.remove('active');
+  } else {
+    panelAmerigo.classList.add('active');
+    panelTorre.classList.remove('active');
+    tabAmerigo.classList.add('active');
+    tabTorre.classList.remove('active');
+    /* Carica stream solo al primo tap */
+    if (!amerigoLoaded) {
+      amerigoLoaded = true;
+      loadAmerigoStream();
+    }
+  }
+}
+
 window.addEventListener('load', initWebcam);
 
 /* ── CONFIG ─────────────────────────────── */
