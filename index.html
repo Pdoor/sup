@@ -1256,13 +1256,13 @@ footer {
       <div class="webcam-label">WEBCAM LIVE</div>
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
       <div class="cam-tabs">
-        <button class="cam-tab active" id="tabTorre" onclick="switchCam('torre')">TORRE</button>
-        <button class="cam-tab" id="tabAmerigo" onclick="switchCam('amerigo')">AMERIGO</button>
+        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">TORRE</button>
+        <button class="cam-tab active" id="tabAmerigo" onclick="switchCam('amerigo')">AMERIGO</button>
       </div>
     </div>
 
     <!-- Panel 1: Torre Pedrera YouTube -->
-    <div class="vbox active" id="panelTorre">
+    <div class="vbox" id="panelTorre">
       <iframe id="webcamIframe" src=""
         allow="autoplay;encrypted-media;picture-in-picture"
         allowfullscreen playsinline loading="lazy"
@@ -1273,7 +1273,7 @@ footer {
     </div>
 
     <!-- Panel 2: Bagno Amerigo — stream HLS via proxy SkylineWebcams -->
-    <div class="vbox" id="panelAmerigo">
+    <div class="vbox active" id="panelAmerigo">
       <video id="amerigoVideo" playsinline muted
         style="width:100%;height:100%;object-fit:cover;display:block;background:#000;">
       </video>
@@ -1430,7 +1430,11 @@ function switchCam(cam) {
   }
 }
 
-window.addEventListener('load', initWebcam);
+window.addEventListener('load', () => {
+  initWebcam();          // Torre (lazy, iframe src vuoto finché non si clicca)
+  amerigoLoaded = true;  // segna come caricato così switchCam non lo richiama
+  loadAmerigoStream();   // avvia subito Amerigo
+});
 
 /* ── CONFIG ─────────────────────────────── */
 const LAT = 44.07, LON = 12.62;  // Torre Pedrera, Rimini
