@@ -1078,6 +1078,27 @@ header {
 
 .vbox iframe { width: 100%; height: 100%; border: none; display: block; }
 
+/* Controlli nativi video visibili sopra l'overlay */
+.vbox video::-webkit-media-controls { z-index: 10; }
+
+/* Su iOS i controlli nativi escono fuori dal border-radius —
+   usiamo un wrapper che non taglia con overflow:hidden il video,
+   ma mantiene il bordo arrotondato visivamente con una maschera */
+#panelAmerigo {
+  overflow: visible;
+  border-radius: 18px;
+}
+#panelAmerigo::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+  pointer-events: none; z-index: 20;
+}
+#panelAmerigo video {
+  border-radius: 18px;
+}
+
 .vlabel {
   position: absolute; top: 10px; left: 10px; z-index: 3;
   font-family: var(--mono);
@@ -1256,8 +1277,8 @@ footer {
       <div class="webcam-label">WEBCAM LIVE</div>
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
       <div class="cam-tabs">
-        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">Hotel IDA</button>
-        <button class="cam-tab active" id="tabAmerigo" onclick="switchCam('amerigo')">Bagno AMERIGO</button>
+        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">TORRE</button>
+        <button class="cam-tab active" id="tabAmerigo" onclick="switchCam('amerigo')">AMERIGO</button>
       </div>
     </div>
 
@@ -1274,17 +1295,19 @@ footer {
 
     <!-- Panel 2: Bagno Amerigo — stream HLS via proxy SkylineWebcams -->
     <div class="vbox active" id="panelAmerigo">
-      <video id="amerigoVideo" playsinline muted
+      <video id="amerigoVideo" playsinline muted controls
+        x-webkit-airplay="allow"
+        webkit-playsinline
         style="width:100%;height:100%;object-fit:cover;display:block;background:#000;">
       </video>
-      <!-- overlay stato -->
+      <!-- overlay stato: z-index alto ma pointer-events:none quando nascosto -->
       <div id="amerigoOverlay" style="
         position:absolute;inset:0;display:flex;flex-direction:column;
         align-items:center;justify-content:center;gap:8px;
         background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
         font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;
         color:rgba(220,235,255,.55);text-transform:uppercase;text-align:center;
-        padding:20px;z-index:5;">
+        padding:20px;z-index:8;border-radius:18px;">
         <div id="amerigoOverlayIcon" style="font-size:22px;margin-bottom:4px;">📡</div>
         <div id="amerigoOverlayMsg">CONNESSIONE IN CORSO…</div>
         <div id="amerigoOverlayBtn" style="display:none;margin-top:10px;">
@@ -1326,11 +1349,16 @@ function amerigoStatus(icon, msg, showBtn){
   const ico = document.getElementById('amerigoOverlayIcon');
   const txt = document.getElementById('amerigoOverlayMsg');
   const btn = document.getElementById('amerigoOverlayBtn');
-  if (showBtn === 'hide') { ov.style.display = 'none'; return; }
-  ico.textContent      = icon;
-  txt.textContent      = msg;
-  ov.style.display     = 'flex';
-  btn.style.display    = showBtn ? 'block' : 'none';
+  if (showBtn === 'hide') {
+    ov.style.display       = 'none';
+    ov.style.pointerEvents = 'none';
+    return;
+  }
+  ico.textContent        = icon;
+  txt.textContent        = msg;
+  ov.style.display       = 'flex';
+  ov.style.pointerEvents = 'auto';
+  btn.style.display      = showBtn ? 'block' : 'none';
 }
 
 /* Fetch token fresco dal Worker e (ri)avvia HLS */
