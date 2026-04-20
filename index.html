@@ -1099,36 +1099,8 @@ header {
   border-radius: 18px;
 }
 
-/* Pulsante Picture-in-Picture (modalità floating) */
-.pip-btn {
-  position: absolute; top: 10px; right: 10px; z-index: 25;
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 10px 5px 9px;
-  font-family: var(--mono);
-  font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
-  color: rgba(220,235,255,.85);
-  background: rgba(0,0,0,.55);
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: var(--r-pill);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  cursor: pointer;
-  transition: background .2s ease, color .2s ease, border-color .2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,.35);
-}
-.pip-btn span:first-child { font-size: 11px; line-height: 1; }
-.pip-btn:hover  { background: rgba(0,0,0,.7); color: #fff; border-color: rgba(255,255,255,.25); }
-.pip-btn:active { transform: scale(.97); }
-.pip-btn.is-active {
-  color: #00c8f0;
-  border-color: rgba(0,200,240,.5);
-  background: rgba(0,200,240,.12);
-  box-shadow: 0 0 14px rgba(0,200,240,.25);
-}
-
 .vlabel {
-  position: absolute; top: 10px; left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
+  position: absolute; top: 10px; left: 10px; z-index: 3;
   font-family: var(--mono);
   font-size: 6.5px; letter-spacing: 2.5px;
   color: rgba(255,255,255,.6);
@@ -1137,7 +1109,6 @@ header {
   padding: 4px 11px; border-radius: var(--r-pill);
   text-transform: uppercase; pointer-events: none;
   border: 1px solid rgba(255,255,255,.06);
-  text-align: center; white-space: nowrap;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1349,16 +1320,6 @@ footer {
           </button>
         </div>
       </div>
-      <!-- Pulsante Picture-in-Picture: il video galleggia sopra altre app -->
-      <button id="amerigoPipBtn" type="button"
-              class="pip-btn"
-              onclick="toggleAmerigoPip()"
-              title="Modalità floating (Picture-in-Picture)"
-              aria-label="Attiva finestra galleggiante"
-              style="display:none;">
-        <span id="amerigoPipIcon">⧉</span>
-        <span id="amerigoPipLabel">FLOAT</span>
-      </button>
       <div class="vlabel">BAGNO AMERIGO 59</div>
     </div>
   </div>
@@ -1501,69 +1462,7 @@ window.addEventListener('load', () => {
   initWebcam();          // Torre (lazy, iframe src vuoto finché non si clicca)
   amerigoLoaded = true;  // segna come caricato così switchCam non lo richiama
   loadAmerigoStream();   // avvia subito Amerigo
-  initAmerigoPip();      // mostra il tasto "FLOAT" se PiP è supportato
 });
-
-/* ── PICTURE-IN-PICTURE (modalità floating sopra altre app) ────────────
-   Il video galleggia in una mini-finestra persistente, fuori dal
-   browser, sopra qualunque altra app del sistema. Supportato da:
-   - Chrome / Edge / Firefox / Opera desktop (API standard)
-   - Safari macOS & iPadOS (API webkit)
-   - iPhone Safari 14+ (webkit, solo in fullscreen -> pip automatico)
-   NON supportato: Firefox Android, alcune webview in-app.
-*/
-function initAmerigoPip(){
-  const video = document.getElementById('amerigoVideo');
-  const btn   = document.getElementById('amerigoPipBtn');
-  if (!video || !btn) return;
-
-  const standardSupport = ('pictureInPictureEnabled' in document) && document.pictureInPictureEnabled;
-  const webkitSupport   = typeof video.webkitSupportsPresentationMode === 'function'
-                          && video.webkitSupportsPresentationMode('picture-in-picture');
-
-  if (!standardSupport && !webkitSupport) {
-    btn.style.display = 'none';
-    return;
-  }
-  btn.style.display = 'inline-flex';
-
-  /* Aggiorna lo stato visivo del pulsante quando PiP entra/esce */
-  video.addEventListener('enterpictureinpicture', () => btn.classList.add('is-active'));
-  video.addEventListener('leavepictureinpicture', () => btn.classList.remove('is-active'));
-  video.addEventListener('webkitpresentationmodechanged', () => {
-    if (video.webkitPresentationMode === 'picture-in-picture') btn.classList.add('is-active');
-    else btn.classList.remove('is-active');
-  });
-}
-
-async function toggleAmerigoPip(){
-  const video = document.getElementById('amerigoVideo');
-  if (!video) return;
-
-  try {
-    /* API standard (Chrome/Edge/Firefox/Opera, Safari macOS recenti) */
-    if ('pictureInPictureEnabled' in document && document.pictureInPictureEnabled) {
-      if (document.pictureInPictureElement === video) {
-        await document.exitPictureInPicture();
-      } else {
-        /* Alcuni browser richiedono che il video stia riproducendo */
-        if (video.paused) { try { await video.play(); } catch(_) {} }
-        await video.requestPictureInPicture();
-      }
-      return;
-    }
-    /* Fallback Safari / iOS */
-    if (typeof video.webkitSupportsPresentationMode === 'function'
-        && video.webkitSupportsPresentationMode('picture-in-picture')) {
-      const mode = video.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture';
-      video.webkitSetPresentationMode(mode);
-      return;
-    }
-    console.warn('Picture-in-Picture non supportato da questo browser.');
-  } catch (e) {
-    console.error('PiP error:', e);
-  }
-}
 
 /* ── CONFIG ─────────────────────────────── */
 const LAT = 44.07, LON = 12.62;  // Torre Pedrera, Rimini
