@@ -1151,6 +1151,29 @@ header {
   height: 100%;
 }
 
+.vbox.sim-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100svh;
+  height: 100dvh;
+  aspect-ratio: auto;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.vbox.sim-fullscreen iframe {
+  width: 100%;
+  height: 100%;
+}
+
+body.video-fullscreen {
+  overflow: hidden;
+}
+
 .v-fullscreen {
   position: absolute;
   top: 10px;
@@ -1182,6 +1205,13 @@ header {
 
 .v-fullscreen:active {
   transform: scale(.96);
+}
+
+.vbox.sim-fullscreen .v-fullscreen,
+.vbox:fullscreen .v-fullscreen,
+.vbox:-webkit-full-screen .v-fullscreen {
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
 }
 
 /* Controlli nativi video visibili sopra l'overlay */
@@ -1888,6 +1918,21 @@ function switchCam(cam) {
 async function fullscreenPanel(panelId) {
   const panel = document.getElementById(panelId);
   if (!panel) return;
+  const simulatedPanel = document.querySelector('.vbox.sim-fullscreen');
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if (simulatedPanel) {
+    simulatedPanel.classList.remove('sim-fullscreen');
+    document.body.classList.remove('video-fullscreen');
+    return;
+  }
+
+  if (isIOS) {
+    panel.classList.add('sim-fullscreen');
+    document.body.classList.add('video-fullscreen');
+    return;
+  }
 
   try {
     if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -1903,11 +1948,24 @@ async function fullscreenPanel(panelId) {
       await panel.requestFullscreen();
     } else if (panel.webkitRequestFullscreen) {
       panel.webkitRequestFullscreen();
+    } else {
+      panel.classList.add('sim-fullscreen');
+      document.body.classList.add('video-fullscreen');
     }
   } catch (err) {
     console.warn('Fullscreen non disponibile:', err);
+    panel.classList.add('sim-fullscreen');
+    document.body.classList.add('video-fullscreen');
   }
 }
+
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  const simulatedPanel = document.querySelector('.vbox.sim-fullscreen');
+  if (!simulatedPanel) return;
+  simulatedPanel.classList.remove('sim-fullscreen');
+  document.body.classList.remove('video-fullscreen');
+});
 
 window.addEventListener('load', () => {
   initWebcam();
