@@ -1052,6 +1052,11 @@ header {
    ═══════════════════════════════════════════════════════ */
 .webcam-section { margin: 0 14px 8px; }
 
+.webcam-section.fullscreen-host {
+  animation: none !important;
+  transform: none !important;
+}
+
 .webcam-header {
   display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
 }
@@ -1921,17 +1926,18 @@ async function fullscreenPanel(panelId) {
   const panel = document.getElementById(panelId);
   if (!panel) return;
   const simulatedPanel = document.querySelector('.vbox.sim-fullscreen');
+  const webcamSection = panel.closest('.webcam-section');
   const hasIframe = !!panel.querySelector('iframe');
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   if (simulatedPanel) {
-    simulatedPanel.classList.remove('sim-fullscreen');
-    document.body.classList.remove('video-fullscreen');
+    closeSimulatedFullscreen();
     return;
   }
 
   if (isIOS || hasIframe) {
+    webcamSection?.classList.add('fullscreen-host');
     panel.classList.add('sim-fullscreen');
     document.body.classList.add('video-fullscreen');
     return;
@@ -1952,31 +1958,45 @@ async function fullscreenPanel(panelId) {
     } else if (panel.webkitRequestFullscreen) {
       panel.webkitRequestFullscreen();
     } else {
+      webcamSection?.classList.add('fullscreen-host');
       panel.classList.add('sim-fullscreen');
       document.body.classList.add('video-fullscreen');
     }
   } catch (err) {
     console.warn('Fullscreen non disponibile:', err);
+    webcamSection?.classList.add('fullscreen-host');
     panel.classList.add('sim-fullscreen');
     document.body.classList.add('video-fullscreen');
   }
 }
 
-document.addEventListener('keydown', event => {
-  if (event.key !== 'Escape') return;
+function closeSimulatedFullscreen() {
   const simulatedPanel = document.querySelector('.vbox.sim-fullscreen');
   if (!simulatedPanel) return;
   simulatedPanel.classList.remove('sim-fullscreen');
+  simulatedPanel.closest('.webcam-section')?.classList.remove('fullscreen-host');
   document.body.classList.remove('video-fullscreen');
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  closeSimulatedFullscreen();
 });
 
-document.addEventListener('pointerup', event => {
+let lastFullscreenTouch = 0;
+
+function handleFullscreenButtonEvent(event) {
   const btn = event.target.closest('[data-fullscreen-panel]');
   if (!btn) return;
+  if (event.type === 'click' && Date.now() - lastFullscreenTouch < 700) return;
+  if (event.type === 'touchend') lastFullscreenTouch = Date.now();
   event.preventDefault();
   event.stopPropagation();
   fullscreenPanel(btn.dataset.fullscreenPanel);
-});
+}
+
+document.addEventListener('click', handleFullscreenButtonEvent);
+document.addEventListener('touchend', handleFullscreenButtonEvent, { passive: false });
 
 window.addEventListener('load', () => {
   initWebcam();
