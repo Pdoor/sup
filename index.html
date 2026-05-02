@@ -1352,14 +1352,14 @@ footer {
       <div class="webcam-label">WEBCAM LIVE</div>
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
       <div class="cam-tabs">
-        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">H.IDA</button>
-        <button class="cam-tab" id="tabRio" onclick="switchCam('rio')">RIO PIRCIO</button>
-        <button class="cam-tab active" id="tabAmerigo" onclick="switchCam('amerigo')">AMERIGO</button>
+        <button class="cam-tab" id="tabTorre" data-cam="torre" onclick="switchCam('torre')">H.IDA</button>
+        <button class="cam-tab" id="tabRio" data-cam="rio" onclick="switchCam('rio')">RIO PIRCIO</button>
+        <button class="cam-tab active" id="tabAmerigo" data-cam="amerigo" onclick="switchCam('amerigo')">AMERIGO</button>
       </div>
     </div>
 
     <!-- Panel 1: H.Ida / Torre Pedrera YouTube -->
-    <div class="vbox" id="panelTorre">
+    <div class="vbox" id="panelTorre" data-cam="torre">
       <iframe id="webcamIframe" src=""
         allow="autoplay;encrypted-media;picture-in-picture"
         allowfullscreen playsinline loading="lazy"
@@ -1370,7 +1370,7 @@ footer {
     </div>
 
     <!-- Panel 2: Rio Pircio — Meteoproject player -->
-    <div class="vbox" id="panelRio">
+    <div class="vbox" id="panelRio" data-cam="rio">
       <iframe id="rioIframe" src=""
         allow="autoplay;encrypted-media;picture-in-picture"
         allowfullscreen playsinline loading="lazy"
@@ -1381,7 +1381,7 @@ footer {
     </div>
 
     <!-- Panel 3: Bagno Amerigo — stream HLS via proxy SkylineWebcams -->
-    <div class="vbox active" id="panelAmerigo">
+    <div class="vbox active" id="panelAmerigo" data-cam="amerigo">
       <video id="amerigoVideo" playsinline muted controls
         x-webkit-airplay="allow"
         webkit-playsinline
@@ -1430,8 +1430,54 @@ const DEFAULT_SETTINGS = {
   defaultWebcam: 'rio',
   visibleWebcams: { torre: false, rio: true, amerigo: true },
   defaultLocationId: 'torre-pedrera',
-  locations: [DEFAULT_LOCATION]
+  locations: [DEFAULT_LOCATION],
+  customWebcams: []
 };
+
+function slugify(text){
+  return String(text || 'stream')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'stream';
+}
+
+function skylineProxyUrl(url){
+  try {
+    const parsed = new URL(url);
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    const webcamIdx = parts.indexOf('webcam');
+    const clean = webcamIdx >= 0 ? parts.slice(webcamIdx + 1) : parts;
+    return clean.length ? `https://skyline-proxy.gmeluzzi.workers.dev/stream/${clean.join('/')}` : '';
+  } catch(e) {
+    return '';
+  }
+}
+
+function normalizeCustomWebcam(cam){
+  const id = String(cam?.id || `custom-${slugify(cam?.name || 'stream')}`).replace(/[^a-zA-Z0-9_-]/g, '-');
+  const name = String(cam?.name || 'Streaming').trim() || 'Streaming';
+  const url = String(cam?.url || '').trim();
+  const type = cam?.type === 'skyline' ? 'skyline' : 'iframe';
+  return {
+    id,
+    name,
+    url,
+    type,
+    proxyUrl: type === 'skyline' ? String(cam?.proxyUrl || skylineProxyUrl(url) || '') : ''
+  };
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+}
 
 function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
   return {
@@ -1448,6 +1494,10 @@ function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
 function loadSettings(){
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null') || {};
+    const customWebcams = Array.isArray(stored.customWebcams)
+      ? stored.customWebcams.map(normalizeCustomWebcam).filter(cam => cam.url)
+      : [];
+    const allWebcamIds = ['torre','rio','amerigo'].concat(customWebcams.map(cam => cam.id));
     const locations = Array.isArray(stored.locations) && stored.locations.length
       ? stored.locations.map(loc => normalizeLocation(loc))
       : [DEFAULT_LOCATION];
@@ -1455,21 +1505,22 @@ function loadSettings(){
     const defaultLocationId = locations.some(loc => loc.id === stored.defaultLocationId)
       ? stored.defaultLocationId
       : DEFAULT_SETTINGS.defaultLocationId;
-    const visibleWebcams = ['torre','rio','amerigo'].reduce((acc, id) => {
+    const visibleWebcams = allWebcamIds.reduce((acc, id) => {
       if (stored.visibleWebcams && typeof stored.visibleWebcams[id] === 'boolean') {
         acc[id] = stored.visibleWebcams[id];
       } else if (typeof stored.showWebcamTabs === 'boolean') {
         acc[id] = stored.showWebcamTabs;
       } else {
-        acc[id] = DEFAULT_SETTINGS.visibleWebcams[id];
+        acc[id] = DEFAULT_SETTINGS.visibleWebcams[id] ?? true;
       }
       return acc;
     }, {});
     return {
-      defaultWebcam: ['torre','rio','amerigo'].includes(stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
+      defaultWebcam: allWebcamIds.includes(stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
       visibleWebcams,
       defaultLocationId,
-      locations
+      locations,
+      customWebcams
     };
   } catch(e) {
     return DEFAULT_SETTINGS;
@@ -1478,10 +1529,11 @@ function loadSettings(){
 
 function applyWebcamTabsVisibility(){
   const visible = appSettings.visibleWebcams || DEFAULT_SETTINGS.visibleWebcams;
-  document.getElementById('tabTorre').classList.toggle('hidden', !visible.torre);
-  document.getElementById('tabRio').classList.toggle('hidden', !visible.rio);
-  document.getElementById('tabAmerigo').classList.toggle('hidden', !visible.amerigo);
-  document.querySelector('.cam-tabs').classList.toggle('hidden', !visible.torre && !visible.rio && !visible.amerigo);
+  document.querySelectorAll('.cam-tab').forEach(tab => {
+    const cam = tab.dataset.cam;
+    tab.classList.toggle('hidden', visible[cam] === false);
+  });
+  document.querySelector('.cam-tabs').classList.toggle('hidden', !Array.from(document.querySelectorAll('.cam-tab')).some(tab => !tab.classList.contains('hidden')));
 }
 
 const appSettings = loadSettings();
@@ -1498,10 +1550,67 @@ const PROXY_URL = 'https://skyline-proxy.gmeluzzi.workers.dev/stream/italia/emil
 let amerigoLoaded  = false;
 let hlsInstance    = null;
 let tokenRefreshing = false;
+const customStreamState = {};
 
 function initWebcam(){
   document.getElementById('webcamIframe').src = WEBCAM_SRC;
   document.getElementById('rioIframe').src = RIO_PIRCIO_SRC;
+  renderCustomWebcams();
+}
+
+function renderCustomWebcams(){
+  const tabs = document.querySelector('.cam-tabs');
+  const section = document.querySelector('.webcam-section');
+  (appSettings.customWebcams || []).forEach(cam => {
+    if (document.querySelector(`[data-cam="${cam.id}"]`)) return;
+    const safeName = escapeHtml(cam.name.toUpperCase());
+    const safeUrl = escapeHtml(cam.url);
+    const tab = document.createElement('button');
+    tab.className = 'cam-tab';
+    tab.dataset.cam = cam.id;
+    tab.textContent = cam.name.toUpperCase();
+    tab.addEventListener('click', () => switchCam(cam.id));
+    tabs.appendChild(tab);
+
+    const panel = document.createElement('div');
+    panel.className = 'vbox';
+    panel.dataset.cam = cam.id;
+    panel.id = `panel-${cam.id}`;
+    if (cam.type === 'skyline') {
+      panel.innerHTML = `
+        <video id="video-${cam.id}" playsinline muted controls x-webkit-airplay="allow" webkit-playsinline
+          style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>
+        <div id="overlay-${cam.id}" style="
+          position:absolute;inset:0;display:flex;flex-direction:column;
+          align-items:center;justify-content:center;gap:8px;
+          background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
+          font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;
+          color:rgba(220,235,255,.55);text-transform:uppercase;text-align:center;
+          padding:20px;z-index:8;border-radius:18px;">
+          <div id="overlayIcon-${cam.id}" style="font-size:22px;margin-bottom:4px;">📡</div>
+          <div id="overlayMsg-${cam.id}">CONNESSIONE IN CORSO…</div>
+          <div id="overlayBtn-${cam.id}" style="display:none;margin-top:10px;">
+            <button onclick="loadCustomSkylineStream('${cam.id}')" style="
+              font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;
+              text-transform:uppercase;padding:6px 18px;border-radius:100px;cursor:pointer;
+              background:rgba(0,200,240,.15);border:1px solid rgba(0,200,240,.35);
+              color:#00c8f0;box-shadow:0 0 12px rgba(0,200,240,.15);">
+              ↻ RIPROVA
+            </button>
+          </div>
+        </div>
+        <div class="vlabel">${safeName}</div>
+      `;
+    } else {
+      panel.innerHTML = `
+        <iframe src="${safeUrl}" allow="autoplay;encrypted-media;picture-in-picture"
+          allowfullscreen playsinline loading="lazy" referrerpolicy="no-referrer"
+          title="Webcam ${escapeHtml(cam.name)}"></iframe>
+        <div class="vlabel">${safeName}</div>
+      `;
+    }
+    section.appendChild(panel);
+  });
 }
 
 /* Overlay stato */
@@ -1596,20 +1705,105 @@ async function loadAmerigoStream(silent = false){
   }
 }
 
-function switchCam(cam) {
-  const panelTorre   = document.getElementById('panelTorre');
-  const panelRio     = document.getElementById('panelRio');
-  const panelAmerigo = document.getElementById('panelAmerigo');
-  const tabTorre     = document.getElementById('tabTorre');
-  const tabRio       = document.getElementById('tabRio');
-  const tabAmerigo   = document.getElementById('tabAmerigo');
+function customSkylineStatus(id, icon, msg, showBtn){
+  const ov = document.getElementById(`overlay-${id}`);
+  const ico = document.getElementById(`overlayIcon-${id}`);
+  const txt = document.getElementById(`overlayMsg-${id}`);
+  const btn = document.getElementById(`overlayBtn-${id}`);
+  if (!ov || !ico || !txt || !btn) return;
+  if (showBtn === 'hide') {
+    ov.style.display = 'none';
+    ov.style.pointerEvents = 'none';
+    return;
+  }
+  ico.textContent = icon;
+  txt.textContent = msg;
+  ov.style.display = 'flex';
+  ov.style.pointerEvents = 'auto';
+  btn.style.display = showBtn ? 'block' : 'none';
+}
 
-  panelTorre.classList.toggle('active', cam === 'torre');
-  panelRio.classList.toggle('active', cam === 'rio');
-  panelAmerigo.classList.toggle('active', cam === 'amerigo');
-  tabTorre.classList.toggle('active', cam === 'torre');
-  tabRio.classList.toggle('active', cam === 'rio');
-  tabAmerigo.classList.toggle('active', cam === 'amerigo');
+async function loadCustomSkylineStream(id, silent = false){
+  const cam = (appSettings.customWebcams || []).find(item => item.id === id);
+  if (!cam || !cam.proxyUrl) return;
+  customStreamState[id] = customStreamState[id] || {};
+  if (customStreamState[id].refreshing) return;
+  customStreamState[id].refreshing = true;
+  if (!silent) customSkylineStatus(id, '📡', 'CONNESSIONE IN CORSO…', false);
+
+  let streamUrl;
+  try {
+    const resp = await fetch(cam.proxyUrl + '?_=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!data.stream) throw new Error('no stream field');
+    streamUrl = data.stream;
+  } catch(e) {
+    console.error('Custom skyline proxy error:', e);
+    customSkylineStatus(id, '⚠️', 'STREAM NON DISPONIBILE', true);
+    customStreamState[id].refreshing = false;
+    return;
+  }
+
+  const video = document.getElementById(`video-${id}`);
+  if (!video) {
+    customStreamState[id].refreshing = false;
+    return;
+  }
+  if (customStreamState[id].hls) {
+    customStreamState[id].hls.destroy();
+    customStreamState[id].hls = null;
+  }
+
+  function startHLS(){
+    if (Hls.isSupported()) {
+      const hls = new Hls({ lowLatencyMode: true, maxBufferLength: 10, xhrSetup: xhr => xhr.withCredentials = false });
+      customStreamState[id].hls = hls;
+      hls.loadSource(streamUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(()=>{});
+        customSkylineStatus(id, '', '', 'hide');
+        customStreamState[id].refreshing = false;
+        customStreamState[id].loaded = true;
+      });
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (!data.fatal) return;
+        customStreamState[id].refreshing = false;
+        loadCustomSkylineStream(id, true);
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = streamUrl;
+      video.load();
+      video.play().catch(()=>{});
+      customSkylineStatus(id, '', '', 'hide');
+      customStreamState[id].refreshing = false;
+      customStreamState[id].loaded = true;
+      setTimeout(() => loadCustomSkylineStream(id, true), 25 * 60 * 1000);
+    } else {
+      customSkylineStatus(id, '⚠️', 'HLS NON SUPPORTATO', false);
+      customStreamState[id].refreshing = false;
+    }
+  }
+
+  if (typeof Hls === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.7/hls.min.js';
+    s.onload = startHLS;
+    s.onerror = () => { customSkylineStatus(id, '⚠️', 'ERRORE PLAYER', true); customStreamState[id].refreshing = false; };
+    document.head.appendChild(s);
+  } else {
+    startHLS();
+  }
+}
+
+function switchCam(cam) {
+  document.querySelectorAll('.vbox').forEach(panel => {
+    panel.classList.toggle('active', panel.dataset.cam === cam);
+  });
+  document.querySelectorAll('.cam-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.cam === cam);
+  });
 
   if (cam === 'torre') {
     return;
@@ -1620,6 +1814,11 @@ function switchCam(cam) {
       amerigoLoaded = true;
       loadAmerigoStream();
     }
+  }
+
+  const custom = (appSettings.customWebcams || []).find(item => item.id === cam);
+  if (custom?.type === 'skyline' && !customStreamState[cam]?.loaded) {
+    loadCustomSkylineStream(cam);
   }
 }
 

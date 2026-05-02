@@ -265,7 +265,9 @@ header {
   display: flex; gap: 7px;
 }
 
-input[type="search"] {
+input[type="search"],
+input[type="text"],
+input[type="url"] {
   flex: 1; min-width: 0;
   font-family: var(--mono);
   font-size: 10px; letter-spacing: 1.2px;
@@ -277,7 +279,9 @@ input[type="search"] {
   padding: 9px 12px;
   outline: none;
 }
-input[type="search"]::placeholder { color: rgba(220,235,255,.35); }
+input[type="search"]::placeholder,
+input[type="text"]::placeholder,
+input[type="url"]::placeholder { color: rgba(220,235,255,.35); }
 
 button {
   font-family: var(--mono);
@@ -581,6 +585,19 @@ input[type="range"]::-moz-range-thumb {
     <div class="option-list" id="webcamList"></div>
   </section>
 
+  <section class="card add-location-card">
+    <div class="section-title">Aggiungi Streaming</div>
+    <div class="search-row">
+      <input id="streamNameInput" type="text" placeholder="Nome webcam" autocomplete="off">
+      <button id="addStreamBtn" type="button">Aggiungi</button>
+    </div>
+    <div class="search-row" style="margin-top:7px;">
+      <input id="streamUrlInput" type="url" placeholder="https://..." autocomplete="off">
+    </div>
+    <div class="status" id="streamStatus"></div>
+    <div class="option-list" id="customWebcamList"></div>
+  </section>
+
   <section class="card">
     <div class="section-title">Pulsanti Streaming</div>
     <div class="hint">Scegli quali pulsanti webcam mostrare nella dashboard. Lo streaming default resta attivo anche se il suo pulsante e' nascosto.</div>
@@ -604,7 +621,8 @@ const DEFAULT_SETTINGS = {
   defaultWebcam: 'rio',
   visibleWebcams: { torre: false, rio: true, amerigo: true },
   defaultLocationId: 'torre-pedrera',
-  locations: [DEFAULT_LOCATION]
+  locations: [DEFAULT_LOCATION],
+  customWebcams: []
 };
 const WEBCAMS = [
   { id: 'torre', name: 'H.IDA', meta: 'YouTube · Torre Pedrera' },
@@ -621,6 +639,50 @@ function slugify(text){
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 48) || 'localita';
+}
+
+function normalizeCustomWebcam(cam){
+  const id = String(cam?.id || `custom-${slugify(cam?.name || 'stream')}`).replace(/[^a-zA-Z0-9_-]/g, '-');
+  const name = String(cam?.name || 'Streaming').trim() || 'Streaming';
+  const url = String(cam?.url || '').trim();
+  const type = cam?.type === 'skyline' ? 'skyline' : 'iframe';
+  return {
+    id,
+    name,
+    url,
+    type,
+    proxyUrl: type === 'skyline' ? String(cam?.proxyUrl || skylineProxyUrl(url) || '') : ''
+  };
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+}
+
+function isSkylineUrl(url){
+  try {
+    return new URL(url).hostname.toLowerCase().includes('skylinewebcams');
+  } catch(e) {
+    return false;
+  }
+}
+
+function skylineProxyUrl(url){
+  try {
+    const parsed = new URL(url);
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    const webcamIdx = parts.indexOf('webcam');
+    const clean = webcamIdx >= 0 ? parts.slice(webcamIdx + 1) : parts;
+    return clean.length ? `https://skyline-proxy.gmeluzzi.workers.dev/stream/${clean.join('/')}` : '';
+  } catch(e) {
+    return '';
+  }
 }
 
 function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
@@ -666,6 +728,10 @@ function safeRangeText(bearing, angle){
 function loadSettings(){
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null') || {};
+    const customWebcams = Array.isArray(stored.customWebcams)
+      ? stored.customWebcams.map(normalizeCustomWebcam).filter(cam => cam.url)
+      : [];
+    const allWebcamIds = WEBCAMS.map(cam => cam.id).concat(customWebcams.map(cam => cam.id));
     const locations = Array.isArray(stored.locations) && stored.locations.length
       ? stored.locations.map(loc => normalizeLocation(loc))
       : [DEFAULT_LOCATION];
@@ -673,21 +739,22 @@ function loadSettings(){
     const defaultLocationId = locations.some(loc => loc.id === stored.defaultLocationId)
       ? stored.defaultLocationId
       : DEFAULT_SETTINGS.defaultLocationId;
-    const visibleWebcams = WEBCAMS.reduce((acc, cam) => {
-      if (stored.visibleWebcams && typeof stored.visibleWebcams[cam.id] === 'boolean') {
-        acc[cam.id] = stored.visibleWebcams[cam.id];
+    const visibleWebcams = allWebcamIds.reduce((acc, id) => {
+      if (stored.visibleWebcams && typeof stored.visibleWebcams[id] === 'boolean') {
+        acc[id] = stored.visibleWebcams[id];
       } else if (typeof stored.showWebcamTabs === 'boolean') {
-        acc[cam.id] = stored.showWebcamTabs;
+        acc[id] = stored.showWebcamTabs;
       } else {
-        acc[cam.id] = DEFAULT_SETTINGS.visibleWebcams[cam.id];
+        acc[id] = DEFAULT_SETTINGS.visibleWebcams[id] ?? true;
       }
       return acc;
     }, {});
     return {
-      defaultWebcam: WEBCAMS.some(cam => cam.id === stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
+      defaultWebcam: allWebcamIds.includes(stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
       visibleWebcams,
       defaultLocationId,
-      locations
+      locations,
+      customWebcams
     };
   } catch(e) {
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
@@ -702,7 +769,7 @@ function saveSettings(){
 function renderDashboardOptions(){
   const root = document.getElementById('webcamVisibilityList');
   root.innerHTML = '';
-  WEBCAMS.forEach(cam => {
+  getAllWebcams().forEach(cam => {
     const label = document.createElement('label');
     label.className = 'option toggle-option';
     label.innerHTML = `
@@ -723,6 +790,10 @@ function renderDashboardOptions(){
   });
 }
 
+function getAllWebcams(){
+  return WEBCAMS.concat(settings.customWebcams || []);
+}
+
 function coordText(loc){
   return `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)} · ${loc.timezone}`;
 }
@@ -730,7 +801,7 @@ function coordText(loc){
 function renderWebcams(){
   const root = document.getElementById('webcamList');
   root.innerHTML = '';
-  WEBCAMS.forEach(cam => {
+  getAllWebcams().forEach(cam => {
     const label = document.createElement('label');
     label.className = 'option';
     label.innerHTML = `
@@ -746,6 +817,35 @@ function renderWebcams(){
       renderWebcams();
     });
     root.appendChild(label);
+  });
+}
+
+function renderCustomWebcams(){
+  const root = document.getElementById('customWebcamList');
+  root.innerHTML = '';
+  if (!settings.customWebcams.length) {
+    root.innerHTML = '<div class="empty">Nessuno streaming custom</div>';
+    return;
+  }
+  settings.customWebcams.forEach(cam => {
+    const row = document.createElement('div');
+    row.className = 'option toggle-option';
+    row.innerHTML = `
+      <span>
+        <span class="name">${escapeHtml(cam.name)}</span>
+        <span class="meta">${cam.type === 'skyline' ? 'Skyline proxy HLS' : 'Iframe'} · ${escapeHtml(cam.url)}</span>
+      </span>
+      <button class="danger" type="button">Rimuovi</button>
+    `;
+    row.querySelector('button').addEventListener('click', () => {
+      settings.customWebcams = settings.customWebcams.filter(item => item.id !== cam.id);
+      delete settings.visibleWebcams[cam.id];
+      if (settings.defaultWebcam === cam.id) settings.defaultWebcam = DEFAULT_SETTINGS.defaultWebcam;
+      renderWebcams();
+      renderDashboardOptions();
+      renderCustomWebcams();
+    });
+    root.appendChild(row);
   });
 }
 
@@ -886,9 +986,53 @@ async function searchLocations(){
   }
 }
 
+function addCustomStreaming(){
+  const nameInput = document.getElementById('streamNameInput');
+  const urlInput = document.getElementById('streamUrlInput');
+  const status = document.getElementById('streamStatus');
+  const name = nameInput.value.trim();
+  const url = urlInput.value.trim();
+  if (!name || !url) {
+    status.textContent = 'Inserisci nome e indirizzo streaming';
+    return;
+  }
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch(e) {
+    status.textContent = 'URL non valido';
+    return;
+  }
+  if (!/^https?:$/.test(parsed.protocol)) {
+    status.textContent = 'Usa un indirizzo http o https';
+    return;
+  }
+  const type = isSkylineUrl(url) ? 'skyline' : 'iframe';
+  const proxyUrl = type === 'skyline' ? skylineProxyUrl(url) : '';
+  if (type === 'skyline' && !proxyUrl) {
+    status.textContent = 'URL Skyline non riconosciuto';
+    return;
+  }
+  const id = `custom-${slugify(name)}-${Date.now().toString(36)}`;
+  const cam = normalizeCustomWebcam({ id, name, url, type, proxyUrl });
+  settings.customWebcams.push(cam);
+  settings.visibleWebcams[cam.id] = true;
+  settings.defaultWebcam = cam.id;
+  nameInput.value = '';
+  urlInput.value = '';
+  status.textContent = `${cam.name} aggiunto come default`;
+  renderWebcams();
+  renderDashboardOptions();
+  renderCustomWebcams();
+}
+
 document.getElementById('searchBtn').addEventListener('click', searchLocations);
 document.getElementById('searchInput').addEventListener('keydown', event => {
   if (event.key === 'Enter') searchLocations();
+});
+document.getElementById('addStreamBtn').addEventListener('click', addCustomStreaming);
+document.getElementById('streamUrlInput').addEventListener('keydown', event => {
+  if (event.key === 'Enter') addCustomStreaming();
 });
 document.getElementById('saveBtn').addEventListener('click', saveSettings);
 document.getElementById('bearingInput').addEventListener('input', event => {
@@ -908,6 +1052,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   settings = loadSettings();
   renderWebcams();
   renderDashboardOptions();
+  renderCustomWebcams();
   renderLocations();
   renderBearingEditor();
   document.getElementById('saveStatus').textContent = 'Preferenze ripristinate';
@@ -915,6 +1060,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 renderWebcams();
 renderDashboardOptions();
+renderCustomWebcams();
 renderLocations();
 renderBearingEditor();
 </script>
