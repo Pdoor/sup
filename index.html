@@ -149,11 +149,16 @@ header {
 
 .header-right {
   text-align: right;
-  display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;
+  display: grid;
+  grid-template-columns: auto 34px;
+  grid-template-rows: auto auto;
+  align-items: center;
+  justify-content: end;
+  column-gap: 8px;
 }
 
 .header-time-row {
-  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  display: contents;
 }
 
 .time-display {
@@ -171,12 +176,16 @@ header {
 .date-display {
   font-family: var(--mono);
   font-size: 7px; letter-spacing: 2.5px;
-  color: var(--text-3);
+  color: #ffffff;
+  grid-column: 1;
+  grid-row: 2;
   text-transform: uppercase; margin-top: 3px;
 }
 
 .setup-link {
-  width: 24px; height: 24px; border-radius: 50%;
+  width: 34px; height: 38px; border-radius: 17px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
   display: flex; align-items: center; justify-content: center;
   color: rgba(230,240,255,.82); text-decoration: none;
   background: rgba(255,255,255,.045);
@@ -187,7 +196,7 @@ header {
   -webkit-tap-highlight-color: transparent;
 }
 .setup-link svg {
-  width: 14px; height: 14px;
+  width: 18px; height: 18px;
   stroke: currentColor; stroke-width: 2; fill: none;
   stroke-linecap: round; stroke-linejoin: round;
 }
@@ -1182,14 +1191,14 @@ footer {
     <div class="header-right">
       <div class="header-time-row">
         <div class="time-display" id="clock">--:--</div>
-        <a class="setup-link" href="setup.html" aria-label="Setup">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 0 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 0 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 0 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1a2 2 0 0 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
-          </svg>
-        </a>
       </div>
       <div class="date-display" id="dateDisp">--- - ---</div>
+      <a class="setup-link" href="setup.html" aria-label="Setup">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 0 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 0 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 0 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1a2 2 0 0 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+        </svg>
+      </a>
     </div>
   </header>
 
@@ -1413,7 +1422,7 @@ const DEFAULT_LOCATION = {
   safeHalfAngle: 70
 };
 const DEFAULT_SETTINGS = {
-  defaultWebcam: 'amerigo',
+  defaultWebcam: 'rio',
   defaultLocationId: 'torre-pedrera',
   locations: [DEFAULT_LOCATION]
 };
