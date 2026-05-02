@@ -118,6 +118,7 @@ header {
 
 /* "SUP" — bianco crema dominante, massima luminosità */
 .h1-sup {
+  font-size: .72em;
   background: linear-gradient(160deg, #ffffff 0%, #f5efe0 50%, #ddd0b8 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -127,7 +128,8 @@ header {
     drop-shadow(0 3px 0 rgba(10,5,0,.70))
     drop-shadow(0 6px 16px rgba(200,160,80,.18))
     drop-shadow(0 12px 28px rgba(0,0,0,.50));
-  letter-spacing: 3px;
+  letter-spacing: 2px;
+  vertical-align: baseline;
 }
 
 
@@ -1175,7 +1177,7 @@ footer {
     <div class="logo">
       <h1><span class="h1-meteo">Meteo</span><span class="h1-sup">SUP</span></h1>
       <div class="logo-spacer"></div>
-      <div class="sub">Torre Pedrera</div>
+      <div class="sub" id="locationName">--</div>
     </div>
     <div class="header-right">
       <div class="header-time-row">
@@ -1395,7 +1397,7 @@ footer {
     </div>
   </div>
 
-  <footer>MeteoSUP · Torre Pedrera · Adriatico</footer>
+  <footer>MeteoSUP · <span id="footerLocationName">--</span> · Adriatico</footer>
 </div>
 
 <script>
@@ -1406,7 +1408,9 @@ const DEFAULT_LOCATION = {
   name: 'Torre Pedrera',
   latitude: 44.07,
   longitude: 12.62,
-  timezone: 'Europe/Rome'
+  timezone: 'Europe/Rome',
+  seaBearing: 95,
+  safeHalfAngle: 70
 };
 const DEFAULT_SETTINGS = {
   defaultWebcam: 'amerigo',
@@ -1420,7 +1424,9 @@ function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
     name: String(loc?.name || fallback.name),
     latitude: Number.isFinite(Number(loc?.latitude)) ? Number(loc.latitude) : fallback.latitude,
     longitude: Number.isFinite(Number(loc?.longitude)) ? Number(loc.longitude) : fallback.longitude,
-    timezone: String(loc?.timezone || fallback.timezone)
+    timezone: String(loc?.timezone || fallback.timezone),
+    seaBearing: Number.isFinite(Number(loc?.seaBearing)) ? Number(loc.seaBearing) : fallback.seaBearing,
+    safeHalfAngle: Number.isFinite(Number(loc?.safeHalfAngle)) ? Number(loc.safeHalfAngle) : fallback.safeHalfAngle
   };
 }
 
@@ -1592,6 +1598,7 @@ window.addEventListener('load', () => {
 const LAT = currentLocation.latitude, LON = currentLocation.longitude;
 const API_TIMEZONE = encodeURIComponent(currentLocation.timezone || 'Europe/Rome');
 document.querySelector('.logo .sub').textContent = currentLocation.name;
+document.getElementById('footerLocationName').textContent = currentLocation.name;
 
 /* ── OROLOGIO ───────────────────────────── */
 const DAYS   = ['DOM','LUN','MAR','MER','GIO','VEN','SAB'];
@@ -1625,12 +1632,22 @@ function beaufortDescription(kmh){
   return 'Bf12 · Uragano';
 }
 
-// Torre Pedrera: costa EST sull'Adriatico. 
-// Da mare (buono) = vento da E quadrant: 30°–160°  → .da-mare (ciano)
-// Da terra        = tutto il resto        → .da-terra (corallo/rosso)
+function normDeg(deg){
+  return ((deg%360)+360)%360;
+}
+
+function angularDistance(a,b){
+  return Math.abs(((normDeg(a)-normDeg(b)+540)%360)-180);
+}
+
+function isWithinSeaSector(deg, bearing=currentLocation.seaBearing, halfAngle=currentLocation.safeHalfAngle){
+  return angularDistance(deg, bearing) <= halfAngle;
+}
+
+// Celeste = direzione entro il settore del fronte mare della localita'.
+// Rosso   = direzione opposta / fuori settore, quindi piu' da terra.
 function windClass(deg){
-  const d=((deg%360)+360)%360;
-  return (d>=30&&d<=160)?'da-mare':'da-terra';
+  return isWithinSeaSector(deg) ? 'da-mare' : 'da-terra';
 }
 
 /* ── SVG weather icons — no emoji, pure vector ── */

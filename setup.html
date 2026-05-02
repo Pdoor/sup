@@ -79,11 +79,13 @@ header {
   filter: drop-shadow(0 2px 0 rgba(40,18,0,.92)) drop-shadow(0 10px 24px rgba(0,0,0,.48));
 }
 .h1-sup {
+  font-size: .72em;
   background: linear-gradient(160deg, #ffffff 0%, #f5efe0 50%, #ddd0b8 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
   filter: drop-shadow(0 2px 0 rgba(20,10,0,.95)) drop-shadow(0 12px 28px rgba(0,0,0,.50));
-  letter-spacing: 3px;
+  letter-spacing: 2px;
+  vertical-align: baseline;
 }
 .brand .sub {
   font-family: var(--mono);
@@ -238,6 +240,180 @@ button:disabled {
   text-transform: uppercase;
   padding: 8px 0 2px;
 }
+
+.bearing-grid {
+  display: grid;
+  grid-template-columns: 106px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.bearing-compass {
+  width: 104px; height: 104px;
+  border-radius: 50%;
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,.06), rgba(0,0,0,.55)),
+    conic-gradient(from var(--safe-start), rgba(0,200,240,.28) 0deg var(--safe-span), transparent var(--safe-span) 360deg);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top-color: rgba(255,255,255,.24);
+  border-bottom-color: rgba(0,0,0,.74);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 -1px 0 rgba(0,0,0,.75) inset,
+    0 4px 10px rgba(0,0,0,.48),
+    0 12px 28px rgba(0,0,0,.36);
+}
+
+.bearing-compass::before {
+  content: '';
+  position: absolute; inset: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.bearing-mark {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 8px;
+  color: rgba(255,255,255,.62);
+}
+.bearing-mark.n { top: 5px; left: 50%; transform: translateX(-50%); color: var(--accent); }
+.bearing-mark.e { right: 7px; top: 50%; transform: translateY(-50%); }
+.bearing-mark.s { bottom: 5px; left: 50%; transform: translateX(-50%); }
+.bearing-mark.w { left: 7px; top: 50%; transform: translateY(-50%); }
+
+.bearing-needle {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  transform: rotate(var(--bearing));
+  transform-origin: center;
+  transition: transform .18s ease;
+}
+.bearing-needle::before {
+  content: '';
+  position: absolute;
+  left: -5px; bottom: 2px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 40px solid var(--accent);
+  filter: drop-shadow(0 0 8px rgba(0,200,240,.55));
+}
+.bearing-needle::after {
+  content: '';
+  position: absolute;
+  left: -4px; top: 2px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 32px solid rgba(255,255,255,.72);
+}
+.bearing-dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 7px rgba(255,255,255,.5);
+}
+
+.bearing-readout {
+  display: flex; align-items: baseline; gap: 8px;
+  margin-bottom: 10px;
+}
+.bearing-deg {
+  font-family: var(--disp);
+  font-size: 42px; line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0,0,0,.75), 0 0 18px rgba(0,200,240,.18);
+}
+.bearing-abbr {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 2px;
+  color: var(--accent);
+}
+.bearing-range {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 1.2px; line-height: 1.55;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+.bearing-range strong {
+  color: #fff;
+  font-weight: 400;
+}
+
+.bearing-control {
+  margin-top: 14px;
+}
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 7px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+}
+.control-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: #fff;
+}
+.control-value {
+  font-size: 8px;
+  letter-spacing: 1.6px;
+  color: var(--text-2);
+}
+
+input[type="range"] {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 -1px 0 rgba(0,0,0,.60) inset;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 5px solid var(--accent);
+  box-shadow: 0 0 18px rgba(0,200,240,.36), var(--shadow-chip);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 5px solid var(--accent);
+}
+
+.bearing-presets {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 5px;
+  margin-top: 12px;
+}
+.preset {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 1px;
+  color: var(--text-2);
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top-color: rgba(255,255,255,.16);
+  border-radius: var(--r-pill);
+  padding: 6px 0;
+  box-shadow: var(--shadow-chip);
+}
+.preset.active {
+  color: var(--accent);
+  background: rgba(0,200,240,.13);
+  border-color: rgba(0,200,240,.30);
+}
 </style>
 </head>
 <body>
@@ -259,6 +435,46 @@ button:disabled {
     <div class="section-title">Localita' Default</div>
     <div class="hint" id="currentLocationText"></div>
     <div class="location-list" id="locationList"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">Fronte Mare</div>
+    <div class="hint">Imposta la direzione geografica verso cui guarda la spiaggia e l'ampiezza del settore considerato safe.</div>
+    <div class="bearing-grid">
+      <div class="bearing-compass" id="bearingCompass">
+        <div class="bearing-mark n">N</div>
+        <div class="bearing-mark e">E</div>
+        <div class="bearing-mark s">S</div>
+        <div class="bearing-mark w">W</div>
+        <div class="bearing-needle" id="bearingNeedle"></div>
+        <div class="bearing-dot"></div>
+      </div>
+      <div>
+        <div class="bearing-readout">
+          <div class="bearing-deg" id="bearingText">95°</div>
+          <div class="bearing-abbr" id="bearingAbbr">E</div>
+        </div>
+        <div class="bearing-range">
+          Settore safe<br>
+          <strong id="safeText">25° &rarr; 165°</strong>
+        </div>
+      </div>
+    </div>
+    <div class="bearing-control">
+      <div class="control-row">
+        <div class="control-label">Direzione spiaggia</div>
+        <div class="control-value" id="bearingSmall">95°</div>
+      </div>
+      <input id="bearingInput" type="range" min="0" max="359" value="95">
+      <div class="bearing-presets" id="bearingPresets"></div>
+    </div>
+    <div class="bearing-control">
+      <div class="control-row">
+        <div class="control-label">Ampiezza safe</div>
+        <div class="control-value" id="angleSmall">70°</div>
+      </div>
+      <input id="safeAngleInput" type="range" min="30" max="120" value="70">
+    </div>
   </section>
 
   <section class="card">
@@ -290,7 +506,9 @@ const DEFAULT_LOCATION = {
   name: 'Torre Pedrera',
   latitude: 44.07,
   longitude: 12.62,
-  timezone: 'Europe/Rome'
+  timezone: 'Europe/Rome',
+  seaBearing: 95,
+  safeHalfAngle: 70
 };
 const DEFAULT_SETTINGS = {
   defaultWebcam: 'amerigo',
@@ -322,8 +540,36 @@ function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
     country: loc?.country ? String(loc.country) : '',
     latitude: Number.isFinite(Number(loc?.latitude)) ? Number(loc.latitude) : fallback.latitude,
     longitude: Number.isFinite(Number(loc?.longitude)) ? Number(loc.longitude) : fallback.longitude,
-    timezone: String(loc?.timezone || fallback.timezone)
+    timezone: String(loc?.timezone || fallback.timezone),
+    seaBearing: Number.isFinite(Number(loc?.seaBearing)) ? Number(loc.seaBearing) : fallback.seaBearing,
+    safeHalfAngle: Number.isFinite(Number(loc?.safeHalfAngle)) ? Number(loc.safeHalfAngle) : fallback.safeHalfAngle
   };
+}
+
+const BEARING_PRESETS = [
+  ['N',0], ['NE',45], ['E',90], ['SE',135],
+  ['S',180], ['SW',225], ['W',270], ['NW',315]
+];
+
+function normDeg(deg){
+  return ((deg % 360) + 360) % 360;
+}
+
+function clamp(num, min, max){
+  return Math.min(max, Math.max(min, num));
+}
+
+function compassAbbr(deg){
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  return dirs[Math.round(normDeg(deg) / 22.5) % 16];
+}
+
+function currentLocation(){
+  return settings.locations.find(loc => loc.id === settings.defaultLocationId) || settings.locations[0] || DEFAULT_LOCATION;
+}
+
+function safeRangeText(bearing, angle){
+  return `${normDeg(bearing - angle)}° → ${normDeg(bearing + angle)}°`;
 }
 
 function loadSettings(){
@@ -379,7 +625,7 @@ function renderWebcams(){
 
 function renderLocations(){
   const root = document.getElementById('locationList');
-  const current = settings.locations.find(loc => loc.id === settings.defaultLocationId) || DEFAULT_LOCATION;
+  const current = currentLocation();
   document.getElementById('currentLocationText').textContent = `${current.name} · ${coordText(current)}`;
   root.innerHTML = '';
   settings.locations.forEach(loc => {
@@ -388,15 +634,17 @@ function renderLocations(){
     const canDelete = loc.id !== DEFAULT_LOCATION.id;
     label.innerHTML = `
       <input type="radio" name="defaultLocation" value="${loc.id}" ${settings.defaultLocationId === loc.id ? 'checked' : ''}>
-      <span>
-        <span class="name">${loc.name}</span>
-        <span class="meta">${coordText(loc)}</span>
-      </span>
+        <span>
+          <span class="name">${loc.name}</span>
+          <span class="meta">${coordText(loc)}</span>
+          <span class="meta">fronte ${Math.round(loc.seaBearing)}° · safe ${Math.round(loc.safeHalfAngle)}°</span>
+        </span>
       ${canDelete ? '<button class="danger" type="button">Rimuovi</button>' : '<span class="pill">base</span>'}
     `;
     label.querySelector('input').addEventListener('change', () => {
       settings.defaultLocationId = loc.id;
       renderLocations();
+      renderBearingEditor();
     });
     const removeBtn = label.querySelector('button');
     if (removeBtn) {
@@ -405,10 +653,52 @@ function renderLocations(){
         settings.locations = settings.locations.filter(item => item.id !== loc.id);
         if (settings.defaultLocationId === loc.id) settings.defaultLocationId = DEFAULT_LOCATION.id;
         renderLocations();
+        renderBearingEditor();
       });
     }
     root.appendChild(label);
   });
+}
+
+function renderBearingPresets(bearing){
+  const root = document.getElementById('bearingPresets');
+  root.innerHTML = '';
+  BEARING_PRESETS.forEach(([label, deg]) => {
+    const btn = document.createElement('button');
+    btn.className = 'preset' + (Math.abs(normDeg(bearing) - deg) <= 8 ? ' active' : '');
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      const loc = currentLocation();
+      loc.seaBearing = deg;
+      renderBearingEditor();
+      renderLocations();
+    });
+    root.appendChild(btn);
+  });
+}
+
+function renderBearingEditor(){
+  const loc = currentLocation();
+  loc.seaBearing = normDeg(Math.round(Number(loc.seaBearing) || DEFAULT_LOCATION.seaBearing));
+  loc.safeHalfAngle = clamp(Math.round(Number(loc.safeHalfAngle) || DEFAULT_LOCATION.safeHalfAngle), 30, 120);
+  const bearing = loc.seaBearing;
+  const angle = loc.safeHalfAngle;
+
+  document.getElementById('bearingInput').value = bearing;
+  document.getElementById('safeAngleInput').value = angle;
+  document.getElementById('bearingText').textContent = `${bearing}°`;
+  document.getElementById('bearingSmall').textContent = `${bearing}°`;
+  document.getElementById('angleSmall').textContent = `${angle}°`;
+  document.getElementById('bearingAbbr').textContent = compassAbbr(bearing);
+  document.getElementById('safeText').textContent = safeRangeText(bearing, angle);
+
+  const compass = document.getElementById('bearingCompass');
+  compass.style.setProperty('--bearing', `${bearing}deg`);
+  compass.style.setProperty('--safe-start', `${normDeg(bearing - angle)}deg`);
+  compass.style.setProperty('--safe-span', `${angle * 2}deg`);
+  document.getElementById('bearingNeedle').style.setProperty('--bearing', `${bearing}deg`);
+  renderBearingPresets(bearing);
 }
 
 async function searchLocations(){
@@ -440,7 +730,9 @@ async function searchLocations(){
         country: item.country,
         latitude: item.latitude,
         longitude: item.longitude,
-        timezone: item.timezone || 'Europe/Rome'
+        timezone: item.timezone || 'Europe/Rome',
+        seaBearing: 90,
+        safeHalfAngle: 70
       });
       const row = document.createElement('div');
       row.className = 'result';
@@ -458,7 +750,8 @@ async function searchLocations(){
         if (!exists) settings.locations.push(loc);
         settings.defaultLocationId = loc.id;
         renderLocations();
-        status.textContent = `${loc.name} aggiunta e impostata default`;
+        renderBearingEditor();
+        status.textContent = `${loc.name} aggiunta. Configura il fronte mare prima di salvare`;
       });
       results.appendChild(row);
     });
@@ -472,16 +765,30 @@ document.getElementById('searchInput').addEventListener('keydown', event => {
   if (event.key === 'Enter') searchLocations();
 });
 document.getElementById('saveBtn').addEventListener('click', saveSettings);
+document.getElementById('bearingInput').addEventListener('input', event => {
+  const loc = currentLocation();
+  loc.seaBearing = normDeg(Number(event.target.value));
+  renderBearingEditor();
+  renderLocations();
+});
+document.getElementById('safeAngleInput').addEventListener('input', event => {
+  const loc = currentLocation();
+  loc.safeHalfAngle = clamp(Number(event.target.value), 30, 120);
+  renderBearingEditor();
+  renderLocations();
+});
 document.getElementById('resetBtn').addEventListener('click', () => {
   localStorage.removeItem(SETTINGS_KEY);
   settings = loadSettings();
   renderWebcams();
   renderLocations();
+  renderBearingEditor();
   document.getElementById('saveStatus').textContent = 'Preferenze ripristinate';
 });
 
 renderWebcams();
 renderLocations();
+renderBearingEditor();
 </script>
 </body>
 </html>
