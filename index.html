@@ -1089,6 +1089,10 @@ header {
   margin-left: auto;
 }
 
+.cam-tabs.hidden {
+  display: none;
+}
+
 .cam-tab {
   font-family: var(--mono);
   font-size: 6.5px; letter-spacing: 1.5px; text-transform: uppercase;
@@ -1114,6 +1118,7 @@ header {
 }
 
 .cam-tab:not(.active):active { background: rgba(255,255,255,.08); }
+.cam-tab.hidden { display: none; }
 
 /* ── Video panels ───────────────────────────────────── */
 .vbox {
@@ -1423,6 +1428,7 @@ const DEFAULT_LOCATION = {
 };
 const DEFAULT_SETTINGS = {
   defaultWebcam: 'rio',
+  visibleWebcams: { torre: false, rio: true, amerigo: true },
   defaultLocationId: 'torre-pedrera',
   locations: [DEFAULT_LOCATION]
 };
@@ -1449,14 +1455,33 @@ function loadSettings(){
     const defaultLocationId = locations.some(loc => loc.id === stored.defaultLocationId)
       ? stored.defaultLocationId
       : DEFAULT_SETTINGS.defaultLocationId;
+    const visibleWebcams = ['torre','rio','amerigo'].reduce((acc, id) => {
+      if (stored.visibleWebcams && typeof stored.visibleWebcams[id] === 'boolean') {
+        acc[id] = stored.visibleWebcams[id];
+      } else if (typeof stored.showWebcamTabs === 'boolean') {
+        acc[id] = stored.showWebcamTabs;
+      } else {
+        acc[id] = DEFAULT_SETTINGS.visibleWebcams[id];
+      }
+      return acc;
+    }, {});
     return {
       defaultWebcam: ['torre','rio','amerigo'].includes(stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
+      visibleWebcams,
       defaultLocationId,
       locations
     };
   } catch(e) {
     return DEFAULT_SETTINGS;
   }
+}
+
+function applyWebcamTabsVisibility(){
+  const visible = appSettings.visibleWebcams || DEFAULT_SETTINGS.visibleWebcams;
+  document.getElementById('tabTorre').classList.toggle('hidden', !visible.torre);
+  document.getElementById('tabRio').classList.toggle('hidden', !visible.rio);
+  document.getElementById('tabAmerigo').classList.toggle('hidden', !visible.amerigo);
+  document.querySelector('.cam-tabs').classList.toggle('hidden', !visible.torre && !visible.rio && !visible.amerigo);
 }
 
 const appSettings = loadSettings();
@@ -1600,6 +1625,7 @@ function switchCam(cam) {
 
 window.addEventListener('load', () => {
   initWebcam();
+  applyWebcamTabsVisibility();
   switchCam(appSettings.defaultWebcam);
 });
 

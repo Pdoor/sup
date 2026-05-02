@@ -121,6 +121,44 @@ header {
   -webkit-backdrop-filter: blur(24px);
 }
 
+.save-card {
+  padding: 8px 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-card .section-title {
+  margin-bottom: 0;
+}
+
+.save-card .actions {
+  margin-top: 0;
+}
+
+.save-card .status {
+  grid-column: 1 / -1;
+  margin-top: -2px;
+  min-height: 0;
+}
+
+.save-card .status:empty {
+  display: none;
+}
+
+.add-location-card {
+  padding: 10px 14px;
+}
+
+.add-location-card .section-title {
+  margin-bottom: 8px;
+}
+
+.add-location-card .status {
+  margin-top: 7px;
+}
+
 .section-title {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
@@ -154,6 +192,53 @@ header {
 
 .option input, .location input {
   accent-color: var(--accent);
+}
+
+.toggle-option {
+  grid-template-columns: 1fr auto;
+}
+
+.switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+.switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.switch-track {
+  width: 42px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 1px 0 rgba(255,255,255,.10) inset, 0 -1px 0 rgba(0,0,0,.60) inset;
+  transition: background .18s, border-color .18s, box-shadow .18s;
+}
+.switch-track::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: rgba(230,240,255,.86);
+  box-shadow: var(--shadow-chip);
+  transition: transform .18s;
+}
+.switch input:checked + .switch-track {
+  background: rgba(0,200,240,.18);
+  border-color: rgba(0,200,240,.38);
+  box-shadow: 0 0 14px rgba(0,200,240,.16), 0 1px 0 rgba(255,255,255,.10) inset;
+}
+.switch input:checked + .switch-track::after {
+  transform: translateX(18px);
+  background: #fff;
 }
 
 .name {
@@ -426,9 +511,13 @@ input[type="range"]::-moz-range-thumb {
     <a class="back-link" href="index.html" aria-label="Torna alla dashboard">&lsaquo;</a>
   </header>
 
-  <section class="card">
-    <div class="section-title">Webcam Default</div>
-    <div class="option-list" id="webcamList"></div>
+  <section class="card save-card">
+    <div class="section-title">Salva Impostazioni</div>
+    <div class="actions">
+      <button class="danger" id="resetBtn" type="button">Reset</button>
+      <button id="saveBtn" type="button">Salva</button>
+    </div>
+    <div class="status" id="saveStatus"></div>
   </section>
 
   <section class="card">
@@ -477,9 +566,8 @@ input[type="range"]::-moz-range-thumb {
     </div>
   </section>
 
-  <section class="card">
+  <section class="card add-location-card">
     <div class="section-title">Aggiungi Localita'</div>
-    <div class="hint">Cerca per nome. Le coordinate vengono lette dalla Geocoding API gratuita di Open-Meteo.</div>
     <div class="search-row">
       <input id="searchInput" type="search" placeholder="Rimini, Riccione..." autocomplete="off">
       <button id="searchBtn" type="button">Cerca</button>
@@ -489,14 +577,16 @@ input[type="range"]::-moz-range-thumb {
   </section>
 
   <section class="card">
-    <div class="section-title">Salvataggio</div>
-    <div class="hint">Le preferenze sono salvate su questo dispositivo. Se vengono cancellati i dati del browser, MeteoSUP torna a Torre Pedrera e Rio Pircio.</div>
-    <div class="actions">
-      <button class="danger" id="resetBtn" type="button">Reset</button>
-      <button id="saveBtn" type="button">Salva</button>
-    </div>
-    <div class="status" id="saveStatus"></div>
+    <div class="section-title">Webcam Default</div>
+    <div class="option-list" id="webcamList"></div>
   </section>
+
+  <section class="card">
+    <div class="section-title">Pulsanti Streaming</div>
+    <div class="hint">Scegli quali pulsanti webcam mostrare nella dashboard. Lo streaming default resta attivo anche se il suo pulsante e' nascosto.</div>
+    <div class="option-list" id="webcamVisibilityList"></div>
+  </section>
+
 </div>
 
 <script>
@@ -512,6 +602,7 @@ const DEFAULT_LOCATION = {
 };
 const DEFAULT_SETTINGS = {
   defaultWebcam: 'rio',
+  visibleWebcams: { torre: false, rio: true, amerigo: true },
   defaultLocationId: 'torre-pedrera',
   locations: [DEFAULT_LOCATION]
 };
@@ -582,8 +673,19 @@ function loadSettings(){
     const defaultLocationId = locations.some(loc => loc.id === stored.defaultLocationId)
       ? stored.defaultLocationId
       : DEFAULT_SETTINGS.defaultLocationId;
+    const visibleWebcams = WEBCAMS.reduce((acc, cam) => {
+      if (stored.visibleWebcams && typeof stored.visibleWebcams[cam.id] === 'boolean') {
+        acc[cam.id] = stored.visibleWebcams[cam.id];
+      } else if (typeof stored.showWebcamTabs === 'boolean') {
+        acc[cam.id] = stored.showWebcamTabs;
+      } else {
+        acc[cam.id] = DEFAULT_SETTINGS.visibleWebcams[cam.id];
+      }
+      return acc;
+    }, {});
     return {
       defaultWebcam: WEBCAMS.some(cam => cam.id === stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
+      visibleWebcams,
       defaultLocationId,
       locations
     };
@@ -595,6 +697,30 @@ function loadSettings(){
 function saveSettings(){
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   document.getElementById('saveStatus').textContent = 'Preferenze salvate';
+}
+
+function renderDashboardOptions(){
+  const root = document.getElementById('webcamVisibilityList');
+  root.innerHTML = '';
+  WEBCAMS.forEach(cam => {
+    const label = document.createElement('label');
+    label.className = 'option toggle-option';
+    label.innerHTML = `
+      <span>
+        <span class="name">${cam.name}</span>
+        <span class="meta">Mostra pulsante nella dashboard</span>
+      </span>
+      <span class="switch">
+        <input type="checkbox" data-webcam-toggle="${cam.id}" ${settings.visibleWebcams[cam.id] ? 'checked' : ''}>
+        <span class="switch-track"></span>
+      </span>
+    `;
+    label.querySelector('input').addEventListener('change', event => {
+      settings.visibleWebcams[cam.id] = event.target.checked;
+      renderDashboardOptions();
+    });
+    root.appendChild(label);
+  });
 }
 
 function coordText(loc){
@@ -781,12 +907,14 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   localStorage.removeItem(SETTINGS_KEY);
   settings = loadSettings();
   renderWebcams();
+  renderDashboardOptions();
   renderLocations();
   renderBearingEditor();
   document.getElementById('saveStatus').textContent = 'Preferenze ripristinate';
 });
 
 renderWebcams();
+renderDashboardOptions();
 renderLocations();
 renderBearingEditor();
 </script>
