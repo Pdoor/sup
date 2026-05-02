@@ -150,6 +150,10 @@ header {
   display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;
 }
 
+.header-time-row {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+}
+
 .time-display {
   font-family: var(--disp);
   font-size: 22px; letter-spacing: 2px; line-height: 1;
@@ -168,6 +172,25 @@ header {
   color: var(--text-3);
   text-transform: uppercase; margin-top: 3px;
 }
+
+.setup-link {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(230,240,255,.82); text-decoration: none;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top-color: rgba(255,255,255,.20);
+  border-bottom-color: rgba(0,0,0,.60);
+  box-shadow: var(--shadow-chip);
+  -webkit-tap-highlight-color: transparent;
+}
+.setup-link svg {
+  width: 14px; height: 14px;
+  stroke: currentColor; stroke-width: 2; fill: none;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.setup-link:active { transform: scale(.94); }
+
 
 /* ═══════════════════════════════════════════════════════
    STATUS BAR
@@ -1155,7 +1178,15 @@ footer {
       <div class="sub">Torre Pedrera</div>
     </div>
     <div class="header-right">
-      <div class="time-display" id="clock">--:--</div>
+      <div class="header-time-row">
+        <div class="time-display" id="clock">--:--</div>
+        <a class="setup-link" href="setup.html" aria-label="Setup">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 0 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 0 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 0 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1a2 2 0 0 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+          </svg>
+        </a>
+      </div>
       <div class="date-display" id="dateDisp">--- - ---</div>
     </div>
   </header>
@@ -1368,7 +1399,55 @@ footer {
 </div>
 
 <script>
-/* ── WEBCAM: Torre Pedrera (YouTube) ── */
+/* ── SETTINGS ─────────────────────────── */
+const SETTINGS_KEY = 'meteosup.settings.v1';
+const DEFAULT_LOCATION = {
+  id: 'torre-pedrera',
+  name: 'Torre Pedrera',
+  latitude: 44.07,
+  longitude: 12.62,
+  timezone: 'Europe/Rome'
+};
+const DEFAULT_SETTINGS = {
+  defaultWebcam: 'amerigo',
+  defaultLocationId: 'torre-pedrera',
+  locations: [DEFAULT_LOCATION]
+};
+
+function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
+  return {
+    id: String(loc?.id || fallback.id),
+    name: String(loc?.name || fallback.name),
+    latitude: Number.isFinite(Number(loc?.latitude)) ? Number(loc.latitude) : fallback.latitude,
+    longitude: Number.isFinite(Number(loc?.longitude)) ? Number(loc.longitude) : fallback.longitude,
+    timezone: String(loc?.timezone || fallback.timezone)
+  };
+}
+
+function loadSettings(){
+  try {
+    const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null') || {};
+    const locations = Array.isArray(stored.locations) && stored.locations.length
+      ? stored.locations.map(loc => normalizeLocation(loc))
+      : [DEFAULT_LOCATION];
+    if (!locations.some(loc => loc.id === DEFAULT_LOCATION.id)) locations.unshift(DEFAULT_LOCATION);
+    const defaultLocationId = locations.some(loc => loc.id === stored.defaultLocationId)
+      ? stored.defaultLocationId
+      : DEFAULT_SETTINGS.defaultLocationId;
+    return {
+      defaultWebcam: ['torre','rio','amerigo'].includes(stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
+      defaultLocationId,
+      locations
+    };
+  } catch(e) {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+const appSettings = loadSettings();
+const currentLocation = appSettings.locations.find(loc => loc.id === appSettings.defaultLocationId) || DEFAULT_LOCATION;
+
+/* ── WEBCAM: H.Ida / Torre Pedrera (YouTube) ── */
 const VID = '1A2PUj7SS5o';
 const WEBCAM_SRC = 'https://www.youtube-nocookie.com/embed/'+VID+'?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3';
 const RIO_PIRCIO_SRC = 'https://stream-meteoproject.eu/weathercam-player.php?code=2';
@@ -1505,13 +1584,14 @@ function switchCam(cam) {
 }
 
 window.addEventListener('load', () => {
-  initWebcam();          // Torre (lazy, iframe src vuoto finché non si clicca)
-  amerigoLoaded = true;  // segna come caricato così switchCam non lo richiama
-  loadAmerigoStream();   // avvia subito Amerigo
+  initWebcam();
+  switchCam(appSettings.defaultWebcam);
 });
 
 /* ── CONFIG ─────────────────────────────── */
-const LAT = 44.07, LON = 12.62;  // Torre Pedrera, Rimini
+const LAT = currentLocation.latitude, LON = currentLocation.longitude;
+const API_TIMEZONE = encodeURIComponent(currentLocation.timezone || 'Europe/Rome');
+document.querySelector('.logo .sub').textContent = currentLocation.name;
 
 /* ── OROLOGIO ───────────────────────────── */
 const DAYS   = ['DOM','LUN','MAR','MER','GIO','VEN','SAB'];
@@ -1782,9 +1862,9 @@ async function loadAll(){
   setLoading(true);
   try{
     const [mRes,wRes,xRes]=await Promise.all([
-      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period,sea_surface_temperature&timezone=Europe/Rome`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode,temperature_2m&timezone=Europe/Rome&forecast_days=2`)
+      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period,sea_surface_temperature&timezone=${API_TIMEZONE}`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=${API_TIMEZONE}&forecast_days=2`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode,temperature_2m&timezone=${API_TIMEZONE}&forecast_days=2`)
     ]);
     const [marine,wind,wx]=await Promise.all([mRes.json(),wRes.json(),xRes.json()]);
 

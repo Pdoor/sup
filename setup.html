@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MeteoSUP · Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Bebas+Neue&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070912;
+  --surface: #0c1422;
+  --card: rgba(16,26,46,.82);
+  --border: rgba(255,255,255,.07);
+  --border-hi: rgba(255,255,255,.18);
+  --accent: #00c8f0;
+  --warn: #f0566a;
+  --text: #e6f0ff;
+  --text-2: rgba(220,235,255,.62);
+  --text-3: rgba(220,235,255,.35);
+  --mono: 'DM Mono', monospace;
+  --disp: 'Bebas Neue', sans-serif;
+  --r-card: 22px;
+  --r-pill: 100px;
+  --shadow-card:
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 -1px 0 rgba(0,0,0,.80) inset,
+    0 1px 0 rgba(255,255,255,.10),
+    0 4px 8px rgba(0,0,0,.50),
+    0 14px 32px rgba(0,0,0,.42),
+    0 40px 72px rgba(0,0,0,.32);
+  --shadow-chip:
+    0 1px 0 rgba(255,255,255,.14) inset,
+    0 -1px 0 rgba(0,0,0,.70) inset,
+    0 2px 5px rgba(0,0,0,.42),
+    0 7px 16px rgba(0,0,0,.32);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 85%, rgba(0,120,255,.09), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 85% 10%, rgba(0,200,240,.07), transparent 50%),
+    radial-gradient(ellipse 50% 25% at 60% 72%, rgba(0,180,100,.05), transparent 50%);
+}
+
+#app {
+  position: relative; z-index: 1;
+  max-width: 430px; margin: 0 auto;
+  padding: env(safe-area-inset-top, 16px) 14px 34px;
+}
+
+header {
+  padding: 10px 4px 12px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;
+}
+
+.brand h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 34px; letter-spacing: 1px; line-height: 1;
+}
+.h1-meteo {
+  background: linear-gradient(160deg, #e8c97a 0%, #c8a450 45%, #a07830 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 0 rgba(40,18,0,.92)) drop-shadow(0 10px 24px rgba(0,0,0,.48));
+}
+.h1-sup {
+  background: linear-gradient(160deg, #ffffff 0%, #f5efe0 50%, #ddd0b8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 0 rgba(20,10,0,.95)) drop-shadow(0 12px 28px rgba(0,0,0,.50));
+  letter-spacing: 3px;
+}
+.brand .sub {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 4px;
+  margin-top: 4px;
+  color: rgba(220,235,255,.55);
+  text-transform: uppercase;
+}
+
+.back-link {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(230,240,255,.86); text-decoration: none;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top-color: rgba(255,255,255,.20);
+  border-bottom-color: rgba(0,0,0,.60);
+  box-shadow: var(--shadow-chip);
+  font-family: var(--mono);
+  font-size: 18px;
+}
+
+.card {
+  margin-bottom: 10px;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 1px solid rgba(255,255,255,.22);
+  border-bottom: 1px solid rgba(0,0,0,.75);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.section-title {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 4px;
+  color: #fff; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.hint {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 1px; line-height: 1.55;
+  color: var(--text-2);
+  margin-bottom: 10px;
+}
+
+.option-list, .location-list, .results-list {
+  display: flex; flex-direction: column; gap: 7px;
+}
+
+.option, .location, .result {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center; gap: 9px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-top-color: rgba(255,255,255,.16);
+  border-bottom-color: rgba(0,0,0,.62);
+  background: rgba(255,255,255,.035);
+  box-shadow: var(--shadow-chip);
+}
+
+.option input, .location input {
+  accent-color: var(--accent);
+}
+
+.name {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 2px;
+  color: #fff; text-transform: uppercase;
+}
+
+.meta {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 1.1px; line-height: 1.45;
+  color: var(--text-3);
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+.pill {
+  font-family: var(--mono);
+  font-size: 7px; letter-spacing: 1.8px;
+  color: var(--accent); text-transform: uppercase;
+}
+
+.search-row {
+  display: flex; gap: 7px;
+}
+
+input[type="search"] {
+  flex: 1; min-width: 0;
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 1.2px;
+  color: #fff;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.09);
+  border-top-color: rgba(255,255,255,.18);
+  border-radius: var(--r-pill);
+  padding: 9px 12px;
+  outline: none;
+}
+input[type="search"]::placeholder { color: rgba(220,235,255,.35); }
+
+button {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  background: rgba(0,200,240,.12);
+  border: 1px solid rgba(0,200,240,.28);
+  border-top-color: rgba(0,200,240,.46);
+  border-bottom-color: rgba(0,0,0,.60);
+  border-radius: var(--r-pill);
+  padding: 9px 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow-chip);
+}
+button:active { transform: scale(.97); }
+button.danger {
+  color: var(--warn);
+  background: rgba(240,86,106,.09);
+  border-color: rgba(240,86,106,.24);
+}
+button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.actions {
+  display: flex; justify-content: flex-end; gap: 8px;
+  margin-top: 12px;
+}
+
+.status {
+  min-height: 16px;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 1.6px;
+  color: rgba(220,235,255,.55);
+  text-transform: uppercase;
+}
+
+.empty {
+  font-family: var(--mono);
+  font-size: 8px; letter-spacing: 1.4px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  padding: 8px 0 2px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <h1><span class="h1-meteo">Meteo</span><span class="h1-sup">SUP</span></h1>
+      <div class="sub">Setup</div>
+    </div>
+    <a class="back-link" href="index.html" aria-label="Torna alla dashboard">&lsaquo;</a>
+  </header>
+
+  <section class="card">
+    <div class="section-title">Webcam Default</div>
+    <div class="option-list" id="webcamList"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">Localita' Default</div>
+    <div class="hint" id="currentLocationText"></div>
+    <div class="location-list" id="locationList"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">Aggiungi Localita'</div>
+    <div class="hint">Cerca per nome. Le coordinate vengono lette dalla Geocoding API gratuita di Open-Meteo.</div>
+    <div class="search-row">
+      <input id="searchInput" type="search" placeholder="Rimini, Riccione..." autocomplete="off">
+      <button id="searchBtn" type="button">Cerca</button>
+    </div>
+    <div class="status" id="searchStatus"></div>
+    <div class="results-list" id="resultsList"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">Salvataggio</div>
+    <div class="hint">Le preferenze sono salvate su questo dispositivo. Se vengono cancellati i dati del browser, MeteoSUP torna a Torre Pedrera e Amerigo.</div>
+    <div class="actions">
+      <button class="danger" id="resetBtn" type="button">Reset</button>
+      <button id="saveBtn" type="button">Salva</button>
+    </div>
+    <div class="status" id="saveStatus"></div>
+  </section>
+</div>
+
+<script>
+const SETTINGS_KEY = 'meteosup.settings.v1';
+const DEFAULT_LOCATION = {
+  id: 'torre-pedrera',
+  name: 'Torre Pedrera',
+  latitude: 44.07,
+  longitude: 12.62,
+  timezone: 'Europe/Rome'
+};
+const DEFAULT_SETTINGS = {
+  defaultWebcam: 'amerigo',
+  defaultLocationId: 'torre-pedrera',
+  locations: [DEFAULT_LOCATION]
+};
+const WEBCAMS = [
+  { id: 'torre', name: 'H.IDA', meta: 'YouTube · Torre Pedrera' },
+  { id: 'rio', name: 'RIO PIRCIO', meta: 'Meteoproject · weathercam' },
+  { id: 'amerigo', name: 'AMERIGO', meta: 'Bagno Amerigo 59 · HLS' }
+];
+
+let settings = loadSettings();
+
+function slugify(text){
+  return String(text || 'localita')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'localita';
+}
+
+function normalizeLocation(loc, fallback = DEFAULT_LOCATION){
+  return {
+    id: String(loc?.id || fallback.id),
+    name: String(loc?.name || fallback.name),
+    admin1: loc?.admin1 ? String(loc.admin1) : '',
+    country: loc?.country ? String(loc.country) : '',
+    latitude: Number.isFinite(Number(loc?.latitude)) ? Number(loc.latitude) : fallback.latitude,
+    longitude: Number.isFinite(Number(loc?.longitude)) ? Number(loc.longitude) : fallback.longitude,
+    timezone: String(loc?.timezone || fallback.timezone)
+  };
+}
+
+function loadSettings(){
+  try {
+    const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null') || {};
+    const locations = Array.isArray(stored.locations) && stored.locations.length
+      ? stored.locations.map(loc => normalizeLocation(loc))
+      : [DEFAULT_LOCATION];
+    if (!locations.some(loc => loc.id === DEFAULT_LOCATION.id)) locations.unshift(DEFAULT_LOCATION);
+    const defaultLocationId = locations.some(loc => loc.id === stored.defaultLocationId)
+      ? stored.defaultLocationId
+      : DEFAULT_SETTINGS.defaultLocationId;
+    return {
+      defaultWebcam: WEBCAMS.some(cam => cam.id === stored.defaultWebcam) ? stored.defaultWebcam : DEFAULT_SETTINGS.defaultWebcam,
+      defaultLocationId,
+      locations
+    };
+  } catch(e) {
+    return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  }
+}
+
+function saveSettings(){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  document.getElementById('saveStatus').textContent = 'Preferenze salvate';
+}
+
+function coordText(loc){
+  return `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)} · ${loc.timezone}`;
+}
+
+function renderWebcams(){
+  const root = document.getElementById('webcamList');
+  root.innerHTML = '';
+  WEBCAMS.forEach(cam => {
+    const label = document.createElement('label');
+    label.className = 'option';
+    label.innerHTML = `
+      <input type="radio" name="defaultWebcam" value="${cam.id}" ${settings.defaultWebcam === cam.id ? 'checked' : ''}>
+      <span>
+        <span class="name">${cam.name}</span>
+        <span class="meta">${cam.meta}</span>
+      </span>
+      <span class="pill">${settings.defaultWebcam === cam.id ? 'default' : ''}</span>
+    `;
+    label.querySelector('input').addEventListener('change', () => {
+      settings.defaultWebcam = cam.id;
+      renderWebcams();
+    });
+    root.appendChild(label);
+  });
+}
+
+function renderLocations(){
+  const root = document.getElementById('locationList');
+  const current = settings.locations.find(loc => loc.id === settings.defaultLocationId) || DEFAULT_LOCATION;
+  document.getElementById('currentLocationText').textContent = `${current.name} · ${coordText(current)}`;
+  root.innerHTML = '';
+  settings.locations.forEach(loc => {
+    const label = document.createElement('label');
+    label.className = 'location';
+    const canDelete = loc.id !== DEFAULT_LOCATION.id;
+    label.innerHTML = `
+      <input type="radio" name="defaultLocation" value="${loc.id}" ${settings.defaultLocationId === loc.id ? 'checked' : ''}>
+      <span>
+        <span class="name">${loc.name}</span>
+        <span class="meta">${coordText(loc)}</span>
+      </span>
+      ${canDelete ? '<button class="danger" type="button">Rimuovi</button>' : '<span class="pill">base</span>'}
+    `;
+    label.querySelector('input').addEventListener('change', () => {
+      settings.defaultLocationId = loc.id;
+      renderLocations();
+    });
+    const removeBtn = label.querySelector('button');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', event => {
+        event.preventDefault();
+        settings.locations = settings.locations.filter(item => item.id !== loc.id);
+        if (settings.defaultLocationId === loc.id) settings.defaultLocationId = DEFAULT_LOCATION.id;
+        renderLocations();
+      });
+    }
+    root.appendChild(label);
+  });
+}
+
+async function searchLocations(){
+  const query = document.getElementById('searchInput').value.trim();
+  const status = document.getElementById('searchStatus');
+  const results = document.getElementById('resultsList');
+  if (!query) {
+    status.textContent = 'Inserisci un nome localita';
+    return;
+  }
+  status.textContent = 'Ricerca in corso...';
+  results.innerHTML = '';
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=it&format=json`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const found = Array.isArray(data.results) ? data.results : [];
+    if (!found.length) {
+      status.textContent = 'Nessun risultato';
+      return;
+    }
+    status.textContent = `${found.length} risultati`;
+    found.forEach(item => {
+      const loc = normalizeLocation({
+        id: `${slugify(item.name)}-${Math.round(item.latitude * 10000)}-${Math.round(item.longitude * 10000)}`,
+        name: item.name,
+        admin1: item.admin1,
+        country: item.country,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        timezone: item.timezone || 'Europe/Rome'
+      });
+      const row = document.createElement('div');
+      row.className = 'result';
+      row.innerHTML = `
+        <span></span>
+        <span>
+          <span class="name">${loc.name}</span>
+          <span class="meta">${[loc.admin1, loc.country].filter(Boolean).join(' · ')}</span>
+          <span class="meta">${coordText(loc)}</span>
+        </span>
+        <button type="button">Aggiungi</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        const exists = settings.locations.some(saved => saved.id === loc.id);
+        if (!exists) settings.locations.push(loc);
+        settings.defaultLocationId = loc.id;
+        renderLocations();
+        status.textContent = `${loc.name} aggiunta e impostata default`;
+      });
+      results.appendChild(row);
+    });
+  } catch(e) {
+    status.textContent = 'Errore ricerca localita';
+  }
+}
+
+document.getElementById('searchBtn').addEventListener('click', searchLocations);
+document.getElementById('searchInput').addEventListener('keydown', event => {
+  if (event.key === 'Enter') searchLocations();
+});
+document.getElementById('saveBtn').addEventListener('click', saveSettings);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  localStorage.removeItem(SETTINGS_KEY);
+  settings = loadSettings();
+  renderWebcams();
+  renderLocations();
+  document.getElementById('saveStatus').textContent = 'Preferenze ripristinate';
+});
+
+renderWebcams();
+renderLocations();
+</script>
+</body>
+</html>
