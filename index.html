@@ -1137,6 +1137,53 @@ header {
 
 .vbox iframe { width: 100%; height: 100%; border: none; display: block; }
 
+.vbox:fullscreen,
+.vbox:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.vbox:fullscreen iframe,
+.vbox:-webkit-full-screen iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.v-fullscreen {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 12;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(9,18,32,.72);
+  color: rgba(245,248,255,.94);
+  box-shadow: var(--shadow-chip);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.v-fullscreen svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.v-fullscreen:active {
+  transform: scale(.96);
+}
+
 /* Controlli nativi video visibili sopra l'overlay */
 .vbox video::-webkit-media-controls { z-index: 10; }
 
@@ -1377,6 +1424,14 @@ footer {
         referrerpolicy="no-referrer"
         title="Webcam Rio Pircio">
       </iframe>
+      <button class="v-fullscreen" type="button" onclick="fullscreenPanel('panelRio')" aria-label="Fullscreen Rio Pircio">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 3H3v5"></path>
+          <path d="M16 3h5v5"></path>
+          <path d="M21 16v5h-5"></path>
+          <path d="M8 21H3v-5"></path>
+        </svg>
+      </button>
       <div class="vlabel">RIO PIRCIO</div>
     </div>
 
@@ -1606,6 +1661,14 @@ function renderCustomWebcams(){
         <iframe src="${safeUrl}" allow="autoplay;encrypted-media;picture-in-picture"
           allowfullscreen playsinline loading="lazy" referrerpolicy="no-referrer"
           title="Webcam ${escapeHtml(cam.name)}"></iframe>
+        <button class="v-fullscreen" type="button" onclick="fullscreenPanel('panel-${cam.id}')" aria-label="Fullscreen ${safeName}">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H3v5"></path>
+            <path d="M16 3h5v5"></path>
+            <path d="M21 16v5h-5"></path>
+            <path d="M8 21H3v-5"></path>
+          </svg>
+        </button>
         <div class="vlabel">${safeName}</div>
       `;
     }
@@ -1819,6 +1882,30 @@ function switchCam(cam) {
   const custom = (appSettings.customWebcams || []).find(item => item.id === cam);
   if (custom?.type === 'skyline' && !customStreamState[cam]?.loaded) {
     loadCustomSkylineStream(cam);
+  }
+}
+
+async function fullscreenPanel(panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+      return;
+    }
+
+    if (panel.requestFullscreen) {
+      await panel.requestFullscreen();
+    } else if (panel.webkitRequestFullscreen) {
+      panel.webkitRequestFullscreen();
+    }
+  } catch (err) {
+    console.warn('Fullscreen non disponibile:', err);
   }
 }
 
