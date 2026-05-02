@@ -1051,14 +1051,14 @@ header {
 
 /* ── Cam tabs ───────────────────────────────────────── */
 .cam-tabs {
-  display: flex; gap: 6px; margin-bottom: 10px;
+  display: flex; gap: 4px; margin-bottom: 10px;
   margin-left: auto;
 }
 
 .cam-tab {
   font-family: var(--mono);
-  font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
-  padding: 4px 12px;
+  font-size: 6.5px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 4px 8px;
   border-radius: var(--r-pill);
   border: 1px solid rgba(255,255,255,.07);
   border-top: 1px solid rgba(255,255,255,.18);
@@ -1299,29 +1299,41 @@ footer {
     </div>
   </div>
 
-  <!-- WEBCAM: due sorgenti — Torre Pedrera (YouTube) + Bagno Amerigo -->
+  <!-- WEBCAM: tre sorgenti — H.Ida + Rio Pircio + Bagno Amerigo -->
   <div class="webcam-section">
     <div class="webcam-header">
       <div class="webcam-label">WEBCAM LIVE</div>
       <div class="live-badge"><div class="live-dot"></div>LIVE</div>
       <div class="cam-tabs">
-        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">TORRE</button>
+        <button class="cam-tab" id="tabTorre" onclick="switchCam('torre')">H.IDA</button>
+        <button class="cam-tab" id="tabRio" onclick="switchCam('rio')">RIO PIRCIO</button>
         <button class="cam-tab active" id="tabAmerigo" onclick="switchCam('amerigo')">AMERIGO</button>
       </div>
     </div>
 
-    <!-- Panel 1: Torre Pedrera YouTube -->
+    <!-- Panel 1: H.Ida / Torre Pedrera YouTube -->
     <div class="vbox" id="panelTorre">
       <iframe id="webcamIframe" src=""
         allow="autoplay;encrypted-media;picture-in-picture"
         allowfullscreen playsinline loading="lazy"
         referrerpolicy="no-referrer"
-        title="Webcam Torre Pedrera">
+        title="Webcam H.Ida">
       </iframe>
-      <div class="vlabel">TORRE PEDRERA</div>
+      <div class="vlabel">H.IDA</div>
     </div>
 
-    <!-- Panel 2: Bagno Amerigo — stream HLS via proxy SkylineWebcams -->
+    <!-- Panel 2: Rio Pircio — Meteoproject player -->
+    <div class="vbox" id="panelRio">
+      <iframe id="rioIframe" src=""
+        allow="autoplay;encrypted-media;picture-in-picture"
+        allowfullscreen playsinline loading="lazy"
+        referrerpolicy="no-referrer"
+        title="Webcam Rio Pircio">
+      </iframe>
+      <div class="vlabel">RIO PIRCIO</div>
+    </div>
+
+    <!-- Panel 3: Bagno Amerigo — stream HLS via proxy SkylineWebcams -->
     <div class="vbox active" id="panelAmerigo">
       <video id="amerigoVideo" playsinline muted controls
         x-webkit-airplay="allow"
@@ -1359,6 +1371,7 @@ footer {
 /* ── WEBCAM: Torre Pedrera (YouTube) ── */
 const VID = '1A2PUj7SS5o';
 const WEBCAM_SRC = 'https://www.youtube-nocookie.com/embed/'+VID+'?autoplay=1&mute=1&playsinline=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3';
+const RIO_PIRCIO_SRC = 'https://stream-meteoproject.eu/weathercam-player.php?code=2';
 
 /* ── WEBCAM: Bagno Amerigo — Cloudflare Worker proxy ── */
 const PROXY_URL = 'https://skyline-proxy.gmeluzzi.workers.dev/stream/italia/emilia-romagna/rimini/torre-pedrera';
@@ -1369,6 +1382,7 @@ let tokenRefreshing = false;
 
 function initWebcam(){
   document.getElementById('webcamIframe').src = WEBCAM_SRC;
+  document.getElementById('rioIframe').src = RIO_PIRCIO_SRC;
 }
 
 /* Overlay stato */
@@ -1465,20 +1479,24 @@ async function loadAmerigoStream(silent = false){
 
 function switchCam(cam) {
   const panelTorre   = document.getElementById('panelTorre');
+  const panelRio     = document.getElementById('panelRio');
   const panelAmerigo = document.getElementById('panelAmerigo');
   const tabTorre     = document.getElementById('tabTorre');
+  const tabRio       = document.getElementById('tabRio');
   const tabAmerigo   = document.getElementById('tabAmerigo');
 
+  panelTorre.classList.toggle('active', cam === 'torre');
+  panelRio.classList.toggle('active', cam === 'rio');
+  panelAmerigo.classList.toggle('active', cam === 'amerigo');
+  tabTorre.classList.toggle('active', cam === 'torre');
+  tabRio.classList.toggle('active', cam === 'rio');
+  tabAmerigo.classList.toggle('active', cam === 'amerigo');
+
   if (cam === 'torre') {
-    panelTorre.classList.add('active');
-    panelAmerigo.classList.remove('active');
-    tabTorre.classList.add('active');
-    tabAmerigo.classList.remove('active');
-  } else {
-    panelAmerigo.classList.add('active');
-    panelTorre.classList.remove('active');
-    tabAmerigo.classList.add('active');
-    tabTorre.classList.remove('active');
+    return;
+  }
+
+  if (cam === 'amerigo') {
     if (!amerigoLoaded) {
       amerigoLoaded = true;
       loadAmerigoStream();
