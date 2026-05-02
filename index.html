@@ -1125,6 +1125,58 @@ header {
 .cam-tab:not(.active):active { background: rgba(255,255,255,.08); }
 .cam-tab.hidden { display: none; }
 
+.webcam-fullscreen {
+  width: 30px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  margin-left: 4px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid rgba(255,255,255,.18);
+  border-bottom: 1px solid rgba(0,0,0,.55);
+  background: rgba(255,255,255,.04);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: var(--shadow-chip);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.webcam-fullscreen svg,
+.fullscreen-close svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fullscreen-close {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 10000;
+  width: 42px;
+  height: 42px;
+  display: none;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.20);
+  background: rgba(9,18,32,.82);
+  color: #ffffff;
+  box-shadow: var(--shadow-chip);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.video-fullscreen .fullscreen-close {
+  display: grid;
+}
+
 /* ── Video panels ───────────────────────────────────── */
 .vbox {
   position: relative;
@@ -1177,48 +1229,6 @@ header {
 
 body.video-fullscreen {
   overflow: hidden;
-}
-
-.v-fullscreen {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 12;
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(9,18,32,.72);
-  color: rgba(245,248,255,.94);
-  box-shadow: var(--shadow-chip);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.v-fullscreen svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  stroke-width: 2;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.v-fullscreen:active {
-  transform: scale(.96);
-}
-
-.vbox.sim-fullscreen .v-fullscreen,
-.vbox:fullscreen .v-fullscreen,
-.vbox:-webkit-full-screen .v-fullscreen {
-  top: max(12px, env(safe-area-inset-top));
-  right: max(12px, env(safe-area-inset-right));
 }
 
 /* Controlli nativi video visibili sopra l'overlay */
@@ -1440,6 +1450,14 @@ footer {
         <button class="cam-tab" id="tabRio" data-cam="rio" onclick="switchCam('rio')">RIO PIRCIO</button>
         <button class="cam-tab active" id="tabAmerigo" data-cam="amerigo" onclick="switchCam('amerigo')">AMERIGO</button>
       </div>
+      <button class="webcam-fullscreen" type="button" onclick="fullscreenActiveWebcam(); return false;" aria-label="Fullscreen webcam">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 3H3v5"></path>
+          <path d="M16 3h5v5"></path>
+          <path d="M21 16v5h-5"></path>
+          <path d="M8 21H3v-5"></path>
+        </svg>
+      </button>
     </div>
 
     <!-- Panel 1: H.Ida / Torre Pedrera YouTube -->
@@ -1461,16 +1479,15 @@ footer {
         referrerpolicy="no-referrer"
         title="Webcam Rio Pircio">
       </iframe>
-      <button class="v-fullscreen" type="button" data-fullscreen-panel="panelRio" aria-label="Fullscreen Rio Pircio">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 3H3v5"></path>
-          <path d="M16 3h5v5"></path>
-          <path d="M21 16v5h-5"></path>
-          <path d="M8 21H3v-5"></path>
-        </svg>
-      </button>
       <div class="vlabel">RIO PIRCIO</div>
     </div>
+
+    <button class="fullscreen-close" id="fullscreenCloseBtn" type="button" onclick="closeSimulatedFullscreen(); return false;" aria-label="Chiudi fullscreen">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
 
     <!-- Panel 3: Bagno Amerigo — stream HLS via proxy SkylineWebcams -->
     <div class="vbox active" id="panelAmerigo" data-cam="amerigo">
@@ -1650,6 +1667,24 @@ function initWebcam(){
   renderCustomWebcams();
 }
 
+function withCacheBust(url){
+  try {
+    const parsed = new URL(url, window.location.href);
+    parsed.searchParams.set('_', Date.now());
+    return parsed.toString();
+  } catch(e) {
+    return url;
+  }
+}
+
+function reloadIframe(iframe, baseUrl){
+  if (!iframe || !baseUrl) return;
+  iframe.src = 'about:blank';
+  setTimeout(() => {
+    iframe.src = withCacheBust(baseUrl);
+  }, 80);
+}
+
 function renderCustomWebcams(){
   const tabs = document.querySelector('.cam-tabs');
   const section = document.querySelector('.webcam-section');
@@ -1698,14 +1733,6 @@ function renderCustomWebcams(){
         <iframe src="${safeUrl}" allow="autoplay;encrypted-media;picture-in-picture"
           allowfullscreen playsinline loading="lazy" referrerpolicy="no-referrer"
           title="Webcam ${escapeHtml(cam.name)}"></iframe>
-        <button class="v-fullscreen" type="button" data-fullscreen-panel="panel-${cam.id}" aria-label="Fullscreen ${safeName}">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 3H3v5"></path>
-            <path d="M16 3h5v5"></path>
-            <path d="M21 16v5h-5"></path>
-            <path d="M8 21H3v-5"></path>
-          </svg>
-        </button>
         <div class="vlabel">${safeName}</div>
       `;
     }
@@ -1922,6 +1949,38 @@ function switchCam(cam) {
   }
 }
 
+function refreshWebcamStreams(){
+  const visible = appSettings.visibleWebcams || DEFAULT_SETTINGS.visibleWebcams;
+
+  if (visible.torre !== false) {
+    reloadIframe(document.getElementById('webcamIframe'), WEBCAM_SRC);
+  }
+  if (visible.rio !== false) {
+    reloadIframe(document.getElementById('rioIframe'), RIO_PIRCIO_SRC);
+  }
+  if (visible.amerigo !== false) {
+    amerigoLoaded = true;
+    loadAmerigoStream(true);
+  }
+
+  (appSettings.customWebcams || []).forEach(cam => {
+    if (visible[cam.id] === false) return;
+    if (cam.type === 'skyline') {
+      customStreamState[cam.id] = customStreamState[cam.id] || {};
+      customStreamState[cam.id].loaded = true;
+      loadCustomSkylineStream(cam.id, true);
+      return;
+    }
+    reloadIframe(document.querySelector(`#panel-${cam.id} iframe`), cam.url);
+  });
+}
+
+function fullscreenActiveWebcam() {
+  const panel = document.querySelector('.vbox.active');
+  if (!panel?.id) return;
+  fullscreenPanel(panel.id);
+}
+
 async function fullscreenPanel(panelId) {
   const panel = document.getElementById(panelId);
   if (!panel) return;
@@ -1982,21 +2041,6 @@ document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   closeSimulatedFullscreen();
 });
-
-let lastFullscreenTouch = 0;
-
-function handleFullscreenButtonEvent(event) {
-  const btn = event.target.closest('[data-fullscreen-panel]');
-  if (!btn) return;
-  if (event.type === 'click' && Date.now() - lastFullscreenTouch < 700) return;
-  if (event.type === 'touchend') lastFullscreenTouch = Date.now();
-  event.preventDefault();
-  event.stopPropagation();
-  fullscreenPanel(btn.dataset.fullscreenPanel);
-}
-
-document.addEventListener('click', handleFullscreenButtonEvent);
-document.addEventListener('touchend', handleFullscreenButtonEvent, { passive: false });
 
 window.addEventListener('load', () => {
   initWebcam();
@@ -2384,6 +2428,7 @@ async function loadAll(){
 function refresh(){
   const btn=document.getElementById('refreshBtn');
   btn.classList.add('spin');
+  refreshWebcamStreams();
   loadAll().finally(()=>btn.classList.remove('spin'));
 }
 
