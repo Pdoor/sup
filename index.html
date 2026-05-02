@@ -329,7 +329,7 @@ header {
 .wave-card-label {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
-  color: rgba(0,210,120,.70); text-transform: uppercase;
+  color: #ffffff; text-transform: uppercase;
 }
 
 .wave-card-inner {
@@ -340,7 +340,7 @@ header {
 .card-label {
   font-family: var(--mono);
   font-size: 8px; letter-spacing: 4px;
-  color: rgba(220,235,255,.62); text-transform: uppercase;
+  color: #ffffff; text-transform: uppercase;
   margin-bottom: 8px;
 }
 
@@ -357,7 +357,7 @@ header {
    WIND MAIN — colonna sinistra + wx a destra full-height
    ═══════════════════════════════════════════════════════ */
 .wind-main {
-  display: flex; flex-direction: row; gap: 8px;
+  display: flex; flex-direction: row; gap: 6px;
   align-items: stretch;
   margin-bottom: 10px;
 }
@@ -377,12 +377,12 @@ header {
 }
 
 .wind-widgets-row .spd-widget {
-  flex: 0.8;
+  flex: 1;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  padding: 9px 12px;
+  gap: 8px;
+  padding: 9px 10px;
   min-width: 0;
 }
 
@@ -405,23 +405,24 @@ header {
   align-items: flex-end;
   margin-left: auto;
   padding-left: 4px;
-  gap: 3px;
+  gap: 1px;
 }
 
 .beaufort-label {
-  font-size: 7.5px;
+  font-family: var(--mono);
+  font-size: 8px;
   letter-spacing: 0.5px;
   text-align: right;
   color: #FFFFFF;
   font-weight: 700;
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 1.05;
 }
 
 /* wx meteo: colonna destra, stessa altezza totale */
 .wx-side {
   flex-shrink: 0;
-  width: 155px;
+  width: 160px;
   align-self: stretch;
   display: flex !important;
   flex-direction: column !important;
@@ -435,7 +436,10 @@ header {
 .wx-side::before { display: none; }
 
 .wx-current-row {
-  display: flex; align-items: baseline; gap: 5px;
+  display: grid;
+  grid-template-columns: 22px minmax(34px,auto) 9px minmax(40px,auto);
+  align-items: baseline;
+  column-gap: 5px;
 }
 
 .wx-side .wx-icon { font-size: 18px; line-height: 1; }
@@ -446,7 +450,7 @@ header {
   font-size: 9px;
   color: rgba(220,235,255,.20);
   align-self: center;
-  margin: 0 1px;
+  text-align: center;
 }
 
 .wx-water-temp {
@@ -457,12 +461,20 @@ header {
 }
 
 .wx-water-label {
+  display: grid;
+  grid-template-columns: 22px minmax(34px,auto) 9px minmax(40px,auto);
+  column-gap: 5px;
+  align-items: center;
   font-family: var(--mono);
-  font-size: 5.5px; letter-spacing: 1.2px;
-  color: rgba(0,200,240,.50);
+  font-size: 7.5px; letter-spacing: 1.2px;
+  color: #ffffff;
   text-transform: uppercase;
   text-align: center;
   margin-top: -2px;
+}
+
+.wx-water-label-sep {
+  color: rgba(220,235,255,.28);
 }
 
 .wx-sep {
@@ -489,19 +501,26 @@ header {
 }
 
 .wx-fi {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
   flex: 1; min-width: 0; overflow: hidden;
 }
 
 .wx-fi-h {
   font-family: var(--mono);
   font-size: 5.5px; letter-spacing: 0;
-  color: rgba(220,235,255,.38); text-transform: uppercase;
+  color: #ffffff; text-transform: uppercase;
 }
 
-.wx-fi-i { width: 22px; height: 22px; display: block; margin: 0 auto; }
+.wx-fi-i { width: 20px; height: 20px; display: block; margin: 0 auto; }
 .wx-fi-i svg { width: 100%; height: 100%; display: block; }
 .wx-icon svg { width: 22px; height: 22px; display: inline-block; vertical-align: middle; }
+
+.wx-fi-temp {
+  font-family: var(--disp);
+  font-size: 10px; letter-spacing: .5px; line-height: 1;
+  color: rgba(230,240,255,.84);
+  text-shadow: 0 1px 0 rgba(255,255,255,.10), 0 2px 6px rgba(0,0,0,.32);
+}
 
 /* ── Compass ────────────────────────────────────────── */
 .compass {
@@ -710,7 +729,7 @@ header {
 .wx-cond {
   font-family: var(--mono);
   font-size: 6px; letter-spacing: 1.5px;
-  color: var(--text-3); text-transform: uppercase;
+  color: #ffffff; text-transform: uppercase;
   text-align: center; line-height: 1.6; white-space: pre-line;
 }
 
@@ -725,7 +744,7 @@ header {
 .forecast-label {
   font-family: var(--mono);
   font-size: 6.5px; letter-spacing: 3px;
-  color: rgba(220,235,255,.62); text-transform: uppercase;
+  color: #ffffff; text-transform: uppercase;
   margin-bottom: 5px;
 }
 
@@ -1200,7 +1219,12 @@ footer {
           <div class="wx-temp-sep">|</div>
           <div class="wx-water-temp" id="wxWaterTemp">--&#xB0;</div>
         </div>
-        <div class="wx-water-label">aria &nbsp;·&nbsp; mare</div>
+        <div class="wx-water-label">
+          <span></span>
+          <span>&#xB0; ARIA</span>
+          <span class="wx-water-label-sep">|</span>
+          <span>&#xB0; MARE</span>
+        </div>
         <div class="wx-cond" id="wxCond">---</div>
         <div class="wx-sep"></div>
         <div class="wx-forecast" id="wxForecast">
@@ -1221,7 +1245,7 @@ footer {
   </div>
 
   <div class="wave-card">
-    <div class="wave-card-label">Onde</div>
+    <div class="wave-card-label">Onde e Marea</div>
     <div class="wave-card-inner">
     <div class="wave-svg">
       <svg viewBox="0 0 70 38" fill="none">
@@ -1742,7 +1766,7 @@ async function loadAll(){
     const [mRes,wRes,xRes]=await Promise.all([
       fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wave_height,wave_direction,wave_period,sea_surface_temperature&timezone=Europe/Rome`),
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=winddirection_10m,windspeed_10m&hourly=winddirection_10m,windspeed_10m&wind_speed_unit=kmh&timezone=Europe/Rome&forecast_days=2`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode&timezone=Europe/Rome&forecast_days=2`)
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weathercode&hourly=weathercode,temperature_2m&timezone=Europe/Rome&forecast_days=2`)
     ]);
     const [marine,wind,wx]=await Promise.all([mRes.json(),wRes.json(),xRes.json()]);
 
@@ -1785,7 +1809,7 @@ async function loadAll(){
     /* meteo forecast biorario */
     const now=new Date();
     if(wx.hourly?.time && wx.hourly?.weathercode){
-      const wxTimes=wx.hourly.time, wxCodes=wx.hourly.weathercode;
+      const wxTimes=wx.hourly.time, wxCodes=wx.hourly.weathercode, wxTemps=wx.hourly.temperature_2m;
       const fcast=document.getElementById('wxForecast');
       let wxStartIdx=wxTimes.findIndex(s=>new Date(s)>now);
       if(wxStartIdx<0) wxStartIdx=0;
@@ -1798,7 +1822,9 @@ async function loadAll(){
         const ico=wmoInfo(wxCodes[i]).icon;
         const div=document.createElement('div');
         div.className='wx-fi';
-        div.innerHTML=`<div class="wx-fi-h">${hh}</div><div class="wx-fi-i">${ico}</div>`;
+        const temp=wxTemps?.[i];
+        const tempHtml=temp!=null ? `<div class="wx-fi-temp">${Math.round(temp)}°</div>` : '';
+        div.innerHTML=`<div class="wx-fi-h">${hh}</div><div class="wx-fi-i">${ico}</div>${tempHtml}`;
         fcast.appendChild(div);
       }
     }
@@ -1812,7 +1838,7 @@ async function loadAll(){
       if(t>now){
         const el=document.createElement('div');
         el.className='fi';
-        el.innerHTML=`<div class="fi-time">${String(t.getHours()).padStart(2,'0')}:00</div><div class="fi-dir ${windClass(wdirs[i])}">${degToCompass(wdirs[i])}</div><div class="fi-deg">${Math.round(wdirs[i])}°</div><div class="fi-spd ${windClass(wdirs[i])}">${Math.round(wspds[i])}<span class="fi-spd-unit">km/h</span></div>`;
+        el.innerHTML=`<div class="fi-time">${String(t.getHours()).padStart(2,'0')}</div><div class="fi-dir ${windClass(wdirs[i])}">${degToCompass(wdirs[i])}</div><div class="fi-deg">${Math.round(wdirs[i])}°</div><div class="fi-spd ${windClass(wdirs[i])}">${Math.round(wspds[i])}<span class="fi-spd-unit">km/h</span></div>`;
         row.appendChild(el); cnt++;
       }
     }
